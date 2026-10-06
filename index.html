@@ -1,0 +1,754 @@
+<!doctype html>
+<html lang="vi">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Phá đồ mình làm</title>
+<style>
+  :root {
+    --bg: #f6f7f9;
+    --surface: #ffffff;
+    --surface-2: #f0f2f5;
+    --text: #18191a;
+    --muted: #626466;
+    --border: #e1e4e6;
+    --accent: #675cff;
+    --accent-soft: #ecebff;
+    --pass: #12a150;
+    --pass-soft: #e3f6ea;
+    --fail: #e5484d;
+    --fail-soft: #fde8e8;
+    --skip: #8a8f98;
+    --skip-soft: #eceef1;
+    --p0: #e5484d;
+    --p1: #f5a524;
+    --p2: #8a8f98;
+    --shadow: 0 1px 2px rgba(24, 25, 26, 0.06);
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --bg: #111214;
+      --surface: #1a1b1e;
+      --surface-2: #23252a;
+      --text: #ecedee;
+      --muted: #a0a4ab;
+      --border: #2e3036;
+      --accent: #8a82ff;
+      --accent-soft: #2a2850;
+      --pass: #3dd68c;
+      --pass-soft: #12321f;
+      --fail: #ff6b6b;
+      --fail-soft: #3a1717;
+      --skip: #9ba1a6;
+      --skip-soft: #2a2c31;
+      --shadow: none;
+    }
+  }
+  :root[data-theme="dark"] {
+    --bg: #111214;
+    --surface: #1a1b1e;
+    --surface-2: #23252a;
+    --text: #ecedee;
+    --muted: #a0a4ab;
+    --border: #2e3036;
+    --accent: #8a82ff;
+    --accent-soft: #2a2850;
+    --pass: #3dd68c;
+    --pass-soft: #12321f;
+    --fail: #ff6b6b;
+    --fail-soft: #3a1717;
+    --skip: #9ba1a6;
+    --skip-soft: #2a2c31;
+    --shadow: none;
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; }
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font: 14px/1.5 -apple-system, "Segoe UI", "Pretendard", "Malgun Gothic", Roboto, sans-serif;
+  }
+  .wrap { max-width: 980px; margin: 0 auto; padding: 20px 16px 80px; }
+  header.top {
+    position: sticky; top: 0; z-index: 5;
+    background: var(--bg);
+    padding: 12px 0 10px;
+    border-bottom: 1px solid var(--border);
+    margin-bottom: 16px;
+  }
+  .row { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+  .between { justify-content: space-between; }
+  h1 { font-size: 20px; margin: 0; letter-spacing: -0.3px; }
+  .sub { color: var(--muted); font-size: 13px; }
+  input, select, textarea, button {
+    font: inherit; color: inherit;
+  }
+  input[type="date"], input[type="search"], select, textarea, input[type="text"] {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 6px 10px;
+    min-height: 34px;
+  }
+  input[type="search"] { flex: 1 1 200px; min-width: 0; }
+  button {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 6px 12px;
+    min-height: 34px;
+    cursor: pointer;
+  }
+  button:hover { border-color: var(--accent); }
+  button.primary { background: var(--accent); border-color: var(--accent); color: #fff; }
+  button.ghost { background: transparent; }
+  .progress {
+    height: 8px; border-radius: 99px; overflow: hidden;
+    background: var(--surface-2); display: flex; margin: 10px 0 6px;
+  }
+  .progress span { display: block; height: 100%; }
+  .stats { display: flex; gap: 14px; flex-wrap: wrap; font-size: 13px; color: var(--muted); }
+  .stats b { color: var(--text); }
+  .dot { display: inline-block; width: 8px; height: 8px; border-radius: 50%; margin-right: 5px; vertical-align: middle; }
+
+  section.group { margin-bottom: 22px; }
+  .group-head {
+    display: flex; justify-content: space-between; align-items: baseline; gap: 8px;
+    margin: 0 0 8px;
+  }
+  .group-head h2 { font-size: 16px; margin: 0; }
+  .group-head .count { color: var(--muted); font-size: 12px; white-space: nowrap; }
+  .fixed {
+    background: var(--surface-2); border-radius: 10px; padding: 10px 12px;
+    font-size: 13px; color: var(--muted); margin-bottom: 10px;
+  }
+  .fixed summary { cursor: pointer; color: var(--text); font-weight: 600; }
+  .fixed ul { margin: 6px 0 0; padding-left: 18px; }
+
+  .case {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-left: 4px solid var(--border);
+    border-radius: 10px;
+    padding: 10px 12px;
+    margin-bottom: 8px;
+    box-shadow: var(--shadow);
+  }
+  .case.s-pass { border-left-color: var(--pass); }
+  .case.s-fail { border-left-color: var(--fail); background: linear-gradient(0deg, var(--fail-soft), var(--fail-soft)), var(--surface); }
+  .case.s-skip { border-left-color: var(--skip); opacity: 0.75; }
+  .case-top { display: flex; gap: 10px; align-items: flex-start; justify-content: space-between; }
+  .case-main { min-width: 0; flex: 1; }
+  .title { font-weight: 600; margin: 0 0 2px; overflow-wrap: anywhere; }
+  .expect { color: var(--muted); font-size: 13px; overflow-wrap: anywhere; }
+  .expect::before { content: "Mong đợi: "; font-weight: 600; color: var(--text); }
+  .meta { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 6px; }
+  .chip {
+    font-size: 11px; padding: 1px 8px; border-radius: 99px;
+    background: var(--surface-2); color: var(--muted); border: 1px solid var(--border);
+  }
+  .chip.p0 { color: var(--p0); border-color: var(--p0); background: transparent; }
+  .chip.p1 { color: var(--p1); border-color: var(--p1); background: transparent; }
+  .chip.custom { color: var(--accent); border-color: var(--accent); background: transparent; }
+  .status { display: flex; gap: 4px; flex-shrink: 0; }
+  .status button { min-width: 38px; padding: 4px 8px; font-size: 13px; }
+  .status button[aria-pressed="true"].pass { background: var(--pass); border-color: var(--pass); color: #fff; }
+  .status button[aria-pressed="true"].fail { background: var(--fail); border-color: var(--fail); color: #fff; }
+  .status button[aria-pressed="true"].skip { background: var(--skip); border-color: var(--skip); color: #fff; }
+  .note { width: 100%; margin-top: 8px; resize: vertical; min-height: 34px; font-size: 13px; }
+  .note:placeholder-shown { min-height: 34px; height: 34px; }
+  .del { font-size: 12px; padding: 2px 8px; min-height: 0; margin-top: 6px; color: var(--muted); }
+
+  dialog {
+    border: 1px solid var(--border); border-radius: 12px; padding: 18px;
+    background: var(--surface); color: var(--text);
+    width: min(560px, calc(100vw - 32px));
+  }
+  dialog::backdrop { background: rgba(0, 0, 0, 0.4); }
+  dialog label { display: block; font-size: 13px; font-weight: 600; margin: 10px 0 4px; }
+  dialog input, dialog textarea, dialog select { width: 100%; }
+  dialog textarea { min-height: 70px; }
+  .history { font-size: 13px; }
+  .history li { margin: 2px 0; }
+  .history a { color: var(--accent); cursor: pointer; text-decoration: underline; }
+  .empty { color: var(--muted); text-align: center; padding: 30px 0; }
+  .toast {
+    position: fixed; left: 50%; bottom: 20px; transform: translateX(-50%);
+    background: var(--text); color: var(--bg); padding: 8px 14px; border-radius: 8px;
+    font-size: 13px; opacity: 0; transition: opacity .2s; pointer-events: none;
+  }
+  .toast.show { opacity: 1; }
+  @media (max-width: 560px) {
+    .case-top { flex-direction: column; }
+    .status { align-self: stretch; }
+    .status button { flex: 1; }
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="top">
+    <div class="row between">
+      <div>
+        <h1>Phá đồ mình làm</h1>
+        <div class="sub">Checklist test hằng ngày cho những gì mình vừa làm</div>
+      </div>
+      <div class="row">
+        <label class="sub" for="runDate">Ngày test</label>
+        <input type="date" id="runDate" />
+        <button id="themeBtn" class="ghost" title="Đổi giao diện sáng/tối">◐</button>
+      </div>
+    </div>
+    <div class="progress" id="progress"></div>
+    <div class="stats" id="stats"></div>
+    <div class="row" style="margin-top:10px">
+      <input type="search" id="q" placeholder="Tìm test case…" />
+      <select id="fGroup"><option value="">Tất cả nhóm</option></select>
+      <select id="fPrio">
+        <option value="">Mọi mức</option>
+        <option value="P0">P0 – phải test</option>
+        <option value="P1">P1</option>
+        <option value="P2">P2</option>
+      </select>
+      <select id="fStatus">
+        <option value="">Mọi trạng thái</option>
+        <option value="todo">Chưa test</option>
+        <option value="pass">Đạt</option>
+        <option value="fail">Lỗi</option>
+        <option value="skip">Bỏ qua</option>
+      </select>
+    </div>
+    <div class="row" style="margin-top:8px">
+      <button class="primary" id="addBtn">+ Thêm test case</button>
+      <button id="mdBtn">Copy kết quả (Markdown)</button>
+      <button id="historyBtn">Lịch sử</button>
+      <button id="saveFolderBtn" title="Ghi results.json vào thư mục repo — tác vụ mỗi tối sẽ đẩy lên GitHub">Lưu kết quả vào thư mục</button>
+      <button id="exportBtn">Sao lưu JSON</button>
+      <button id="importBtn">Khôi phục JSON</button>
+      <button id="resetBtn" class="ghost">Xoá kết quả ngày này</button>
+      <input type="file" id="importFile" accept="application/json" hidden />
+    </div>
+  </header>
+
+  <main id="list"></main>
+</div>
+
+<dialog id="addDlg">
+  <form method="dialog" id="addForm">
+    <h2 style="margin:0 0 4px;font-size:17px">Thêm test case</h2>
+    <div class="sub">Lưu trong trình duyệt này. Nhớ “Sao lưu JSON” nếu đổi máy / xoá dữ liệu trình duyệt.</div>
+    <label for="aGroup">Nhóm</label>
+    <input type="text" id="aGroup" list="groupList" required placeholder="vd: 4. Bản đồ 위픽" />
+    <datalist id="groupList"></datalist>
+    <label for="aTitle">Làm gì (thao tác phá)</label>
+    <textarea id="aTitle" required placeholder="vd: Chạm 5 ghim thật nhanh khi đang mất mạng"></textarea>
+    <label for="aExpect">Mong đợi</label>
+    <textarea id="aExpect" required placeholder="vd: Card hiện ghim cuối, có thông báo lỗi mạng, không crash"></textarea>
+    <label for="aPrio">Mức ưu tiên</label>
+    <select id="aPrio"><option>P0</option><option selected>P1</option><option>P2</option></select>
+    <label for="aTags">Tag (cách nhau bằng dấu phẩy)</label>
+    <input type="text" id="aTags" placeholder="vd: android, mạng chậm, khách" />
+    <div class="row" style="justify-content:flex-end;margin-top:14px">
+      <button value="cancel" formnovalidate class="ghost">Huỷ</button>
+      <button value="ok" class="primary" id="addOk">Thêm</button>
+    </div>
+  </form>
+</dialog>
+
+<dialog id="historyDlg">
+  <h2 style="margin:0 0 8px;font-size:17px">Lịch sử các ngày test</h2>
+  <ul class="history" id="historyList"></ul>
+  <div class="row" style="justify-content:flex-end;margin-top:12px">
+    <button class="ghost" onclick="this.closest('dialog').close()">Đóng</button>
+  </div>
+</dialog>
+
+<div class="toast" id="toast"></div>
+
+<script>
+/* =========================================================================
+ * DỮ LIỆU — thêm test case cố định ở đây (id phải duy nhất, KHÔNG đổi id cũ
+ * vì kết quả từng ngày lưu theo id). Test case thêm trên giao diện lưu riêng
+ * trong localStorage (key bwihb:custom).
+ * =======================================================================*/
+const GROUPS = [
+  {
+    id: "mycontent",
+    name: "1. 내 콘텐츠 / 위픽",
+    fixed: [
+      "Tab 위픽 / sửa 위픽 / chi tiết 위픽: khôi phục phần code từng làm nhưng chưa được merge.",
+      "Xoá 위픽 → danh sách cập nhật ngay từ chi tiết, menu ⋮ và màn 편집.",
+      "Sửa story: chip danh mục tự sáng đúng kể cả khi category là số, là tên, hoặc rỗng nhưng có danh mục con.",
+      "Sửa story / 여행 상품 / 위픽 từ menu ⋮ ở danh sách → lưu xong mở chi tiết, back mới về danh sách.",
+      "Header chi tiết 위픽 và màn chọn option hết bị đẩy xuống xa mép trên.",
+    ],
+    cases: [
+      { id: "mc-01", p: "P0", t: "Xoá 위픽 từ màn chi tiết → back về danh sách.", e: "Bài biến mất ngay, không nháy lại." },
+      { id: "mc-02", p: "P0", t: "Bật chế độ máy bay → xoá 위픽.", e: "Báo lỗi, bài KHÔNG biến mất khỏi danh sách." },
+      { id: "mc-03", p: "P1", t: "Màn 편집: chọn 3 bài (1 sản phẩm, 1 story, 1 위픽) → xoá cùng lúc → về danh sách.", e: "Cả 3 biến mất, danh sách bên dưới đã cập nhật." },
+      { id: "mc-04", p: "P0", t: "Sửa story từ ⋮ → KHÔNG lưu, bấm back.", e: "Về danh sách, KHÔNG tự mở chi tiết." },
+      { id: "mc-05", p: "P0", t: "Sửa story từ ⋮ → lưu.", e: "Mở chi tiết bài vừa sửa → back về danh sách, không lặp vào chi tiết lần nữa." },
+      { id: "mc-06", p: "P1", t: "Sửa từ MÀN CHI TIẾT → lưu.", e: "Ở lại chi tiết, không chồng thêm một màn chi tiết." },
+      { id: "mc-07", p: "P1", t: "Sửa bài A từ ⋮ → huỷ → sửa bài B từ chi tiết → lưu → quay lại danh sách.", e: "KHÔNG mở chi tiết bài A." },
+      { id: "mc-08", p: "P1", t: "Sửa 여행 상품 từ ⋮ (form EditMyTrip) → lưu.", e: "Mở chi tiết sản phẩm vừa sửa." },
+      { id: "mc-09", p: "P0", t: "Sửa 위픽 từ ⋮ → lưu.", e: "Về 내 콘텐츠 tab 위픽 rồi mở chi tiết; back KHÔNG rơi vào tab bản đồ." },
+      { id: "mc-10", p: "P2", t: "Sửa một story cũ (đăng từ lâu) → xem chip danh mục.", e: "Chip danh mục sáng đúng." },
+      { id: "mc-11", p: "P2", t: "Mở chi tiết 위픽 trên máy có tai thỏ / punch-hole.", e: "Header sát mép trên như các màn khác, không cách xa." },
+    ],
+  },
+  {
+    id: "theme",
+    name: "2. 테마여행 (main → 테마여행 → video → chi tiết)",
+    fixed: [
+      "Sheet 인기테마 theo Figma (bo 16, cao 600, tím #675CFF), bỏ nút làm mới.",
+      "Màn video: header ← ⋮; chạm video phát/dừng + nút loa; phủ tối 10% + gradient; nút 팔로우 kính 2 trạng thái; video phát ngay từ card; vuốt lên mở chi tiết.",
+      "Bài của chính mình: ẩn 팔로우 và không gọi API follow.",
+      "Chia sẻ gửi link bài viết thay vì link file video.",
+      "Chi tiết: có giá (story lấy giá sản phẩm gắn kèm), 예약하기, ⋮ menu, bookmark API thật, avatar mở trang người đăng, khách → gợi ý đăng ký.",
+      "Xem ảnh: hiện trọn ảnh (contain), zoom theo điểm ngón tay, kéo có giới hạn, tối đa 5×.",
+    ],
+    cases: [
+      { id: "th-01", p: "P0", t: "Mở bài CỦA CHÍNH MÌNH ở màn video → ⋮ → 팔로우 취소.", e: "Không có nút 팔로우; không có toast lỗi \"자기 자신을 팔로우할 수 없습니다\"." },
+      { id: "th-02", p: "P1", t: "Bài người khác: bấm 팔로우/팔로잉 thật nhanh 5 lần → thoát ra vào lại.", e: "Trạng thái cuối khớp server. 팔로잉 = nền trắng 40% không viền." },
+      { id: "th-03", p: "P1", t: "Màn video: chạm liên tục 10 lần; bấm nút loa.", e: "Video không kẹt; nút hiện rồi tự ẩn sau ~1s; loa bật/tắt tiếng đúng." },
+      { id: "th-04", p: "P1", t: "Đang phát video → chuyển app khác → quay lại; khoá màn hình → mở lại.", e: "Video không phát tiếng nền khi rời màn; quay lại không crash." },
+      { id: "th-05", p: "P0", t: "Vuốt lên ở GIỮA video; vuốt ngang.", e: "Vuốt lên mở chi tiết; vuốt ngang KHÔNG mở." },
+      { id: "th-06", p: "P1", t: "Bật throttle mạng (emulator: Extended controls → Cellular → chậm) → mở card.", e: "Thumbnail hiện ngay, không đen kèm vòng xoay." },
+      { id: "th-07", p: "P2", t: "Card KHÔNG có video (chỉ ảnh).", e: "Hiện ảnh, không có nút loa/phát, vuốt lên vẫn mở chi tiết." },
+      { id: "th-08", p: "P0", t: "Chia sẻ (⋮ ở màn video và nút chia sẻ ở chi tiết) → mở link trên máy khác / trình duyệt.", e: "Vào BÀI VIẾT, không phải file video. Nút chia sẻ chi tiết không mở chat." },
+      { id: "th-09", p: "P0", t: "Chi tiết STORY có gắn sản phẩm → bấm 예약하기.", e: "Có thanh giá; mở màn option hoặc trang sản phẩm." },
+      { id: "th-10", p: "P1", t: "Chi tiết STORY không gắn sản phẩm.", e: "Không có thanh giá, không crash." },
+      { id: "th-11", p: "P1", t: "Sản phẩm HẾT HẠN BÁN → 예약하기.", e: "Báo hết thời gian bán, không mở màn đặt." },
+      { id: "th-12", p: "P2", t: "Sản phẩm 카페·음식.", e: "Không có thanh 예약하기." },
+      { id: "th-13", p: "P0", t: "Khách chưa đăng nhập: bookmark, nhắn tin, ⋮ → 메시지.", e: "Hiện gợi ý đăng ký, KHÔNG vào chat, không gọi API lỗi im lặng." },
+      { id: "th-14", p: "P1", t: "Bookmark ở chi tiết → back về danh sách.", e: "Card ở danh sách đổi trạng thái theo." },
+      { id: "th-15", p: "P1", t: "Bookmark bật/tắt nhanh 6 lần → thoát vào lại.", e: "Trạng thái + số đếm đúng, không âm." },
+      { id: "th-16", p: "P1", t: "⋮ → 신고 (cả màn video và chi tiết).", e: "Mở màn báo cáo thật (không chỉ toast)." },
+      { id: "th-17", p: "P1", t: "Chi tiết: bấm avatar / tên người đăng (bài người khác và bài của mình).", e: "Người khác → trang người đăng; của mình → không làm gì." },
+      { id: "th-18", p: "P0", t: "Xem ảnh dọc và ảnh ngang.", e: "Thấy TRỌN ảnh (không bị cắt)."  },
+      { id: "th-19", p: "P1", t: "Chụm zoom ở góc ảnh; kéo ảnh ra hết mép rồi thả.", e: "Góc đó giữ dưới ngón tay; thả tay ảnh trượt về, không lộ khoảng trống." },
+      { id: "th-20", p: "P1", t: "Chưa zoom: vuốt ngang. Đã zoom: vuốt ngang.", e: "Chưa zoom → chuyển ảnh; đã zoom → kéo ảnh, không chuyển." },
+      { id: "th-21", p: "P2", t: "Chạm đúp ảnh rồi chạm đúp lần nữa.", e: "Zoom 2.5× đúng chỗ chạm, rồi thu về." },
+      { id: "th-22", p: "P2", t: "Sheet 인기테마: chọn theme, kéo sheet xuống đóng.", e: "Không có nút ↻; theme đang chọn nền #675CFF chữ Medium." },
+    ],
+  },
+  {
+    id: "home",
+    name: "3. Màn main / 퀵메뉴 / thẻ danh sách",
+    fixed: [
+      "Bookmark kính tròn 32 ở section sản phẩm, nội dung phổ biến, magazine.",
+      "Nút cuộn lên đầu trang bỏ vòng xám; không chạy ngầm khi màn không dùng.",
+      "해외여행: back không nháy đen; chọn thành phố quay về đúng màn; ＋ mở menu; 3 loại bookmark hoạt động.",
+      "Banner sự kiện: chuông / tìm kiếm mở màn trong tab Home.",
+      "Bookmark main / 음식…: API lỗi thì hoàn tác; 409/404 coi là thành công; khách → gợi ý đăng ký.",
+      "Thẻ danh sách theo thiết kế mới (ảnh 361:360, bỏ mọi bóng) cho 7 màn; skeleton mới; màn 음식 khoảng trống 12 / 32 / 24.",
+    ],
+    cases: [
+      { id: "hm-01", p: "P0", t: "main → 해외여행 → back 10 lần liên tục (cả lúc đã cuộn và chưa cuộn).", e: "Hàng tab thành phố KHÔNG nháy đen." },
+      { id: "hm-02", p: "P0", t: "해외여행 → 🔍 → chọn thành phố → back.", e: "Về MÀN MAIN, không về màn tìm kiếm; thành phố đã chọn được áp dụng." },
+      { id: "hm-03", p: "P1", t: "Lặp hm-02 ba lần rồi back liên tục.", e: "Stack không nhân bản màn 해외여행." },
+      { id: "hm-04", p: "P1", t: "해외여행: bookmark ở carousel và ở danh sách → mở 인기 액티비티.", e: "Cùng sản phẩm, cùng trạng thái bookmark." },
+      { id: "hm-05", p: "P0", t: "Bookmark khi MẤT MẠNG (main, 해외여행, 음식).", e: "Nút tự trả về trạng thái cũ + báo lỗi." },
+      { id: "hm-06", p: "P1", t: "Bookmark một bài đã bookmark từ thiết bị khác (409).", e: "Giữ trạng thái đã bookmark, không nhảy về." },
+      { id: "hm-07", p: "P0", t: "Khách chưa đăng nhập: bookmark ở main, 해외여행, 음식.", e: "Hiện gợi ý đăng ký." },
+      { id: "hm-08", p: "P1", t: "해외여행: bấm ＋.", e: "Mở menu (위픽 요청, đăng bài…)." },
+      { id: "hm-09", p: "P0", t: "Vào màn 음식, quan sát lúc đang tải.", e: "Skeleton gần vuông, avatar trên-trái, bookmark tròn trên-phải; khi dữ liệu về bố cục KHÔNG nhảy." },
+      { id: "hm-10", p: "P1", t: "Màn 음식: đo khoảng cách (so thiết kế).", e: "App bar → thẻ đầu 12; giữa thẻ 32; thẻ cuối → tab bar 24; không bóng thẻ." },
+      { id: "hm-11", p: "P1", t: "Dữ liệu xấu: tiêu đề 3–4 dòng, giá ₩ 12,345,000, rating 0, không ảnh, không avatar.", e: "Không vỡ bố cục; tiêu đề tối đa 2 dòng có …"  },
+      { id: "hm-12", p: "P0", t: "Mở 6 màn còn lại dùng chung thẻ: 해외여행, 인기 액티비티, 핫 액티비티, 오늘 가능한 체험, sản phẩm người bán, kết quả tìm kiếm.", e: "Không màn nào vỡ bố cục; bookmark ở góc trên-phải." },
+      { id: "hm-13", p: "P1", t: "Màn main: cuộn xuống để hiện nút ↑; mở các màn khác có ＋.", e: "Nút ↑ là kính mờ, không vòng xám; ＋ ở các màn khác vẫn bấm được." },
+      { id: "hm-14", p: "P2", t: "Banner sự kiện → chuông → back; → tìm kiếm → back.", e: "Ở lại tab Home; tab bar ẩn khi tìm kiếm." },
+      { id: "hm-15", p: "P2", t: "Section sản phẩm / nội dung phổ biến / magazine trên ảnh sáng.", e: "Nút bookmark kính tròn 32 nhìn rõ viền." },
+    ],
+  },
+  {
+    id: "map",
+    name: "4. Bản đồ 위픽",
+    fixed: [
+      "Màn chọn vị trí: chạm vào đâu ghim nằm đó, bản đồ không trượt và không đổi zoom; kéo thả ghim cũng vậy. Có log debug.",
+      "Bản đồ chính vẽ bằng GPU thay vì CPU; header Android dùng nền kính tĩnh.",
+      "Bỏ render và gọi API thừa mỗi lần chạm ghim, id ghim ổn định, bỏ log nặng.",
+    ],
+    cases: [
+      { id: "mp-01", p: "P0", t: "Header bản đồ trên Android.", e: "Nền trắng mờ dần, không đen/trống. Kéo sheet 요청 목록 lên tối đa → header nền đặc." },
+      { id: "mp-02", p: "P0", t: "Kéo / zoom bản đồ chính (đo bằng adb shell dumpsys gfxinfo <package>).", e: "Mượt hơn trước (trước: 91% khung hình giật)." },
+      { id: "mp-03", p: "P0", t: "Chạm 5 ghim 위픽 khác nhau thật nhanh.", e: "Card cuối là ghim cuối; không crash; không nháy toàn bộ ghim." },
+      { id: "mp-04", p: "P2", t: "Ghim 위픽 thiếu id (nếu có dữ liệu như vậy).", e: "Ghim không nhảy / nhân đôi khi chạm." },
+      { id: "mp-05", p: "P1", t: "Zoom vào/ra liên tục rồi chạm ghim (máy thật).", e: "Nhãn ghim không vỡ thành chữ đen." },
+      { id: "mp-06", p: "P0", t: "Chọn vị trí: zoom tới level 2 → chạm 3 điểm khác nhau.", e: "Zoom giữ nguyên; ghim đúng chỗ chạm; bản đồ không trượt." },
+      { id: "mp-07", p: "P0", t: "Chọn vị trí: chưa zoom lần nào → chạm ngay.", e: "Zoom KHÔNG đổi." },
+      { id: "mp-08", p: "P1", t: "Chạm bản đồ → rồi chọn địa điểm từ DANH SÁCH tìm kiếm.", e: "Bản đồ PHẢI trượt tới địa điểm đó." },
+      { id: "mp-09", p: "P1", t: "Kéo ghim thả ra sát mép màn.", e: "Bản đồ không nhảy; ghim nằm đúng chỗ thả." },
+      { id: "mp-10", p: "P2", t: "Chạm trúng toà nhà có nhiều cửa hàng.", e: "Mở danh sách chọn cửa hàng." },
+      { id: "mp-11", p: "P2", t: "Xem log debug của màn chọn vị trí trong lúc test mp-06…mp-09.", e: "Có đủ chuỗi log chạm → xử lý → bỏ qua dời bản đồ." },
+    ],
+  },
+  {
+    id: "regress",
+    name: "5. Hồi quy chung (chạy mỗi ngày)",
+    fixed: [
+      "Nhóm kiểm tra nhanh trước khi commit / push — không gắn với 1 lỗi cụ thể.",
+    ],
+    cases: [
+      { id: "rg-01", p: "P0", t: "Reload app (nhấn r trong cửa sổ Metro) rồi mở màn 음식.", e: "Thấy thẻ MỚI (bookmark góc trên-phải). Nếu thấy thẻ cũ = app chưa nạp code mới." },
+      { id: "rg-02", p: "P0", t: "Chạy type-check của dự án.", e: "Không có lỗi trong src." },
+      { id: "rg-03", p: "P1", t: "Đăng xuất → dùng chế độ khách đi qua main, 테마여행, 해외여행, bản đồ.", e: "Không crash, không request 401 lặp, mọi nút cần đăng nhập đều hiện gợi ý." },
+      { id: "rg-04", p: "P1", t: "Bật chế độ máy bay giữa chừng ở mỗi màn đã sửa.", e: "Không crash, có thông báo lỗi hợp lý." },
+      { id: "rg-05", p: "P2", t: "Đổi cỡ chữ hệ thống lớn nhất.", e: "Nút 팔로우 / chip / thẻ không cắt chữ khó đọc." },
+      { id: "rg-06", p: "P2", t: "git status trước khi commit.", e: "Không add nhầm file dở dang của việc khác." },
+    ],
+  },
+];
+
+/* =========================================================================
+ * Lưu trữ
+ * =======================================================================*/
+const KEY_RUN = (d) => `bwihb:run:${d}`;
+const KEY_CUSTOM = "bwihb:custom";
+const KEY_THEME = "bwihb:theme";
+const KEY_FILTER = "bwihb:filter";
+
+const store = {
+  get(k, fallback) {
+    try { const v = localStorage.getItem(k); return v == null ? fallback : JSON.parse(v); }
+    catch (e) { return fallback; }
+  },
+  set(k, v) {
+    try { localStorage.setItem(k, JSON.stringify(v)); return true; }
+    catch (e) { toast("Không lưu được (trình duyệt chặn bộ nhớ?)"); return false; }
+  },
+  del(k) { try { localStorage.removeItem(k); } catch (e) {} },
+  keys() { try { return Object.keys(localStorage); } catch (e) { return []; } },
+};
+
+const todayStr = () => {
+  const d = new Date();
+  const p = (n) => String(n).padStart(2, "0");
+  return `${d.getFullYear()}-${p(d.getMonth() + 1)}-${p(d.getDate())}`;
+};
+
+let runDate = todayStr();
+let run = {};          // { caseId: { s: 'pass'|'fail'|'skip', n: 'note' } }
+let custom = store.get(KEY_CUSTOM, []); // [{id, g, t, e, p, tags}]
+
+function allGroups() {
+  const groups = GROUPS.map((g) => ({ ...g, cases: [...g.cases] }));
+  for (const c of custom) {
+    let g = groups.find((x) => x.name === c.g);
+    if (!g) { g = { id: "c-" + c.g, name: c.g, fixed: [], cases: [] }; groups.push(g); }
+    g.cases.push({ id: c.id, p: c.p, t: c.t, e: c.e, tags: c.tags || [], custom: true });
+  }
+  return groups;
+}
+
+/* =========================================================================
+ * Render
+ * =======================================================================*/
+const $ = (s) => document.querySelector(s);
+const esc = (s) => String(s ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+
+function loadRun() {
+  run = store.get(KEY_RUN(runDate), {});
+}
+function saveRun() {
+  const clean = {};
+  for (const [k, v] of Object.entries(run)) if (v && (v.s || v.n)) clean[k] = v;
+  if (Object.keys(clean).length) store.set(KEY_RUN(runDate), clean); else store.del(KEY_RUN(runDate));
+}
+
+function render() {
+  const q = $("#q").value.trim().toLowerCase();
+  const fg = $("#fGroup").value, fp = $("#fPrio").value, fs = $("#fStatus").value;
+  store.set(KEY_FILTER, { fg, fp, fs });
+  const groups = allGroups();
+
+  // group select + datalist
+  const gs = $("#fGroup");
+  const cur = gs.value;
+  gs.innerHTML = '<option value="">Tất cả nhóm</option>' + groups.map((g) => `<option value="${esc(g.id)}">${esc(g.name)}</option>`).join("");
+  gs.value = cur;
+  $("#groupList").innerHTML = groups.map((g) => `<option value="${esc(g.name)}">`).join("");
+
+  let total = 0, pass = 0, fail = 0, skip = 0;
+  const html = [];
+  for (const g of groups) {
+    const all = g.cases;
+    for (const c of all) {
+      total++;
+      const s = run[c.id]?.s;
+      if (s === "pass") pass++; else if (s === "fail") fail++; else if (s === "skip") skip++;
+    }
+    if (fg && g.id !== fg) continue;
+    const visible = all.filter((c) => {
+      const s = run[c.id]?.s || "todo";
+      if (fp && c.p !== fp) return false;
+      if (fs && s !== fs) return false;
+      if (q) {
+        const hay = [c.t, c.e, (c.tags || []).join(" "), run[c.id]?.n, c.id].join(" ").toLowerCase();
+        if (!hay.includes(q)) return false;
+      }
+      return true;
+    });
+    if (!visible.length) continue;
+    const done = all.filter((c) => run[c.id]?.s).length;
+    html.push(`<section class="group"><div class="group-head"><h2>${esc(g.name)}</h2><span class="count">${done}/${all.length} đã test</span></div>`);
+    if (g.fixed && g.fixed.length) {
+      html.push(`<details class="fixed"><summary>Đã sửa trong nhóm này (${g.fixed.length})</summary><ul>${g.fixed.map((f) => `<li>${esc(f)}</li>`).join("")}</ul></details>`);
+    }
+    for (const c of visible) {
+      const r = run[c.id] || {};
+      const s = r.s || "";
+      const tags = (c.tags || []).map((t) => `<span class="chip">${esc(t)}</span>`).join("");
+      html.push(`<article class="case ${s ? "s-" + s : ""}" data-id="${esc(c.id)}">
+        <div class="case-top">
+          <div class="case-main">
+            <p class="title">${esc(c.t)}</p>
+            <div class="expect">${esc(c.e)}</div>
+            <div class="meta"><span class="chip ${c.p.toLowerCase()}">${esc(c.p)}</span><span class="chip">${esc(c.id)}</span>${c.custom ? '<span class="chip custom">tự thêm</span>' : ""}${tags}</div>
+          </div>
+          <div class="status" role="group" aria-label="Trạng thái">
+            <button class="pass" data-s="pass" aria-pressed="${s === "pass"}" title="Đạt">✓</button>
+            <button class="fail" data-s="fail" aria-pressed="${s === "fail"}" title="Lỗi">✗</button>
+            <button class="skip" data-s="skip" aria-pressed="${s === "skip"}" title="Bỏ qua">–</button>
+          </div>
+        </div>
+        <textarea class="note" placeholder="Ghi chú: thiết bị, log, ảnh chụp, cách tái hiện lỗi…">${esc(r.n || "")}</textarea>
+        ${c.custom ? '<button class="del ghost" data-del="1">Xoá test case này</button>' : ""}
+      </article>`);
+    }
+    html.push(`</section>`);
+  }
+  $("#list").innerHTML = html.join("") || '<div class="empty">Không có test case khớp bộ lọc.</div>';
+
+  const todo = total - pass - fail - skip;
+  const pct = (n) => (total ? (n / total) * 100 : 0);
+  $("#progress").innerHTML =
+    `<span style="width:${pct(pass)}%;background:var(--pass)"></span>` +
+    `<span style="width:${pct(fail)}%;background:var(--fail)"></span>` +
+    `<span style="width:${pct(skip)}%;background:var(--skip)"></span>`;
+  $("#stats").innerHTML =
+    `<span><span class="dot" style="background:var(--pass)"></span>Đạt <b>${pass}</b></span>` +
+    `<span><span class="dot" style="background:var(--fail)"></span>Lỗi <b>${fail}</b></span>` +
+    `<span><span class="dot" style="background:var(--skip)"></span>Bỏ qua <b>${skip}</b></span>` +
+    `<span><span class="dot" style="background:var(--border)"></span>Chưa test <b>${todo}</b></span>` +
+    `<span>Tổng <b>${total}</b> · ${Math.round(pct(pass + fail + skip))}% đã chạy</span>`;
+}
+
+/* =========================================================================
+ * Sự kiện
+ * =======================================================================*/
+$("#list").addEventListener("click", (ev) => {
+  const btn = ev.target.closest("button");
+  if (!btn) return;
+  const card = btn.closest(".case");
+  if (!card) return;
+  const id = card.dataset.id;
+  if (btn.dataset.del) {
+    if (!confirm("Xoá test case tự thêm này? (kết quả các ngày vẫn giữ)")) return;
+    custom = custom.filter((c) => c.id !== id);
+    store.set(KEY_CUSTOM, custom);
+    render();
+    return;
+  }
+  const s = btn.dataset.s;
+  if (!s) return;
+  run[id] = run[id] || {};
+  run[id].s = run[id].s === s ? undefined : s;
+  saveRun();
+  render();
+});
+
+let noteTimer;
+$("#list").addEventListener("input", (ev) => {
+  if (!ev.target.classList.contains("note")) return;
+  const id = ev.target.closest(".case").dataset.id;
+  run[id] = run[id] || {};
+  run[id].n = ev.target.value;
+  clearTimeout(noteTimer);
+  noteTimer = setTimeout(saveRun, 300);
+});
+
+["#q", "#fGroup", "#fPrio", "#fStatus"].forEach((s) => $(s).addEventListener("input", render));
+
+$("#runDate").addEventListener("change", (ev) => {
+  runDate = ev.target.value || todayStr();
+  loadRun();
+  render();
+});
+
+$("#resetBtn").addEventListener("click", () => {
+  if (!confirm(`Xoá toàn bộ kết quả + ghi chú của ngày ${runDate}?`)) return;
+  run = {};
+  saveRun();
+  render();
+});
+
+$("#addBtn").addEventListener("click", () => {
+  $("#addForm").reset();
+  const fg = $("#fGroup").value;
+  const g = allGroups().find((x) => x.id === fg);
+  if (g) $("#aGroup").value = g.name;
+  $("#addDlg").showModal();
+});
+$("#addDlg").addEventListener("close", () => {
+  if ($("#addDlg").returnValue !== "ok") return;
+  const g = $("#aGroup").value.trim(), t = $("#aTitle").value.trim(), e = $("#aExpect").value.trim();
+  if (!g || !t || !e) return;
+  custom.push({
+    id: "cu-" + Date.now().toString(36),
+    g, t, e,
+    p: $("#aPrio").value,
+    tags: $("#aTags").value.split(",").map((x) => x.trim()).filter(Boolean),
+  });
+  store.set(KEY_CUSTOM, custom);
+  render();
+  toast("Đã thêm test case");
+});
+
+$("#mdBtn").addEventListener("click", async () => {
+  const lines = [`## Kết quả test ${runDate}`, ""];
+  const mark = { pass: "✅", fail: "❌", skip: "⏭️" };
+  for (const g of allGroups()) {
+    const rows = g.cases.filter((c) => run[c.id]?.s || run[c.id]?.n);
+    if (!rows.length) continue;
+    lines.push(`### ${g.name}`);
+    for (const c of rows) {
+      const r = run[c.id];
+      lines.push(`- ${mark[r.s] || "⬜"} **${c.id}** ${c.t}`);
+      if (r.n) lines.push(`  - Ghi chú: ${r.n.replace(/\n/g, " / ")}`);
+    }
+    lines.push("");
+  }
+  const failed = allGroups().flatMap((g) => g.cases).filter((c) => run[c.id]?.s === "fail");
+  if (failed.length) lines.splice(2, 0, `**Lỗi: ${failed.length}** — ${failed.map((c) => c.id).join(", ")}`, "");
+  const text = lines.join("\n");
+  try { await navigator.clipboard.writeText(text); toast("Đã copy Markdown"); }
+  catch (e) {
+    const w = window.open("", "_blank");
+    if (w) { w.document.body.innerText = text; } else { prompt("Copy thủ công:", text); }
+  }
+});
+
+$("#historyBtn").addEventListener("click", () => {
+  const days = store.keys().filter((k) => k.startsWith("bwihb:run:")).map((k) => k.slice(10)).sort().reverse();
+  const items = days.map((d) => {
+    const r = store.get(KEY_RUN(d), {});
+    const v = Object.values(r);
+    const c = (s) => v.filter((x) => x.s === s).length;
+    return `<li><a data-day="${esc(d)}">${esc(d)}</a> — ✅ ${c("pass")} · ❌ ${c("fail")} · ⏭️ ${c("skip")}</li>`;
+  });
+  $("#historyList").innerHTML = items.join("") || "<li>Chưa có ngày nào.</li>";
+  $("#historyDlg").showModal();
+});
+$("#historyList").addEventListener("click", (ev) => {
+  const d = ev.target.dataset.day;
+  if (!d) return;
+  runDate = d;
+  $("#runDate").value = d;
+  loadRun();
+  render();
+  $("#historyDlg").close();
+});
+
+function buildExport() {
+  const data = { version: 1, exportedAt: new Date().toISOString(), custom, runs: {} };
+  for (const k of store.keys()) if (k.startsWith("bwihb:run:")) data.runs[k.slice(10)] = store.get(k, {});
+  return JSON.stringify(data, null, 2);
+}
+
+// Ghi results.json thẳng vào thư mục repo (Chrome/Edge: File System Access API).
+// Lần đầu chọn đúng thư mục repo + tên results.json; các lần sau trình duyệt nhớ thư mục.
+// Trình duyệt không hỗ trợ → tải file về, tự chép vào thư mục repo.
+$("#saveFolderBtn").addEventListener("click", async () => {
+  const text = buildExport();
+  if (window.showSaveFilePicker) {
+    try {
+      const handle = await window.showSaveFilePicker({
+        id: "bwihb-results",
+        suggestedName: "results.json",
+        types: [{ description: "JSON", accept: { "application/json": [".json"] } }],
+      });
+      const w = await handle.createWritable();
+      await w.write(text);
+      await w.close();
+      toast("Đã lưu results.json");
+      return;
+    } catch (e) {
+      if (e && e.name === "AbortError") return;
+    }
+  }
+  const blob = new Blob([text], { type: "application/json" });
+  const a = document.createElement("a");
+  a.href = URL.createObjectURL(blob);
+  a.download = "results.json";
+  a.click();
+  URL.revokeObjectURL(a.href);
+  toast("Đã tải results.json — chép vào thư mục repo");
+});
+
+$("#exportBtn").addEventListener("click", () => {
+  const blob = new Blob([buildExport()], { type: "application/json" });
+  const a = document.createElement("a");
+  a.href = URL.createObjectURL(blob);
+  a.download = `breaking-tests-${todayStr()}.json`;
+  a.click();
+  URL.revokeObjectURL(a.href);
+});
+$("#importBtn").addEventListener("click", () => $("#importFile").click());
+$("#importFile").addEventListener("change", async (ev) => {
+  const f = ev.target.files[0];
+  if (!f) return;
+  try {
+    const data = JSON.parse(await f.text());
+    if (!data || typeof data !== "object") throw new Error();
+    if (!confirm("Khôi phục sẽ GỘP test case tự thêm và GHI ĐÈ kết quả các ngày có trong file. Tiếp tục?")) return;
+    const ids = new Set(custom.map((c) => c.id));
+    for (const c of data.custom || []) if (!ids.has(c.id)) custom.push(c);
+    store.set(KEY_CUSTOM, custom);
+    for (const [d, r] of Object.entries(data.runs || {})) store.set(KEY_RUN(d), r);
+    loadRun();
+    render();
+    toast("Đã khôi phục");
+  } catch (e) {
+    toast("File JSON không hợp lệ");
+  } finally {
+    ev.target.value = "";
+  }
+});
+
+/* theme */
+function applyTheme(t) {
+  if (t) document.documentElement.setAttribute("data-theme", t);
+  else document.documentElement.removeAttribute("data-theme");
+}
+$("#themeBtn").addEventListener("click", () => {
+  const cur = document.documentElement.getAttribute("data-theme");
+  const sysDark = window.matchMedia && matchMedia("(prefers-color-scheme: dark)").matches;
+  const isDark = cur ? cur === "dark" : sysDark;
+  const next = isDark ? "light" : "dark";
+  applyTheme(next);
+  store.set(KEY_THEME, next);
+});
+
+let toastTimer;
+function toast(msg) {
+  const el = $("#toast");
+  el.textContent = msg;
+  el.classList.add("show");
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => el.classList.remove("show"), 1800);
+}
+
+/* init */
+applyTheme(store.get(KEY_THEME, null));
+$("#runDate").value = runDate;
+const savedFilter = store.get(KEY_FILTER, {});
+render(); // build group options first
+if (savedFilter.fg) $("#fGroup").value = savedFilter.fg;
+if (savedFilter.fp) $("#fPrio").value = savedFilter.fp;
+if (savedFilter.fs) $("#fStatus").value = savedFilter.fs;
+loadRun();
+render();
+</script>
+</body>
+</html>
