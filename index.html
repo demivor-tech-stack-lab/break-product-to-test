@@ -384,8 +384,26 @@ const GROUPS = [
     ],
   },
   {
+    id: "updates_today",
+    name: "5. Các cập nhật hôm nay (Cafe/Food, UI, Creator)",
+    fixed: [
+      "Thêm bước cấu hình sức chứa (MaxPeopleStep) cho reservation của Cafe/Food.",
+      "Fix CSS bóng đổ và kích thước icon ở header, nút floating ở màn hình chính.",
+      "Cập nhật category pill ở màn cộng đồng khớp với Figma và filter giới tính buddy-pick.",
+      "Cập nhật UI màn Creator (nút floating trắng, avatar blur nâu, card item).",
+    ],
+    cases: [
+      { id: "td-01", p: "P0", t: "Đăng ký Cafe/Food: Đi tới bước Số người.", e: "Có màn hình nhập 'Tổng số người' (tối thiểu 1) sau bước chọn thời gian." },
+      { id: "td-02", p: "P1", t: "Đăng ký Cafe/Food: Nhập số người và Lưu nháp.", e: "Lưu nháp thành công, reload lại vẫn giữ đúng số người đã nhập." },
+      { id: "td-03", p: "P0", t: "Đặt bàn Cafe/Food: Khách xem khung giờ đã đạt giới hạn.", e: "Khung giờ đó bị làm mờ (closed / 마감) và không thể bấm chọn." },
+      { id: "td-04", p: "P2", t: "Màn hình chính: Kiểm tra header và nút nổi (floating button).", e: "Bóng đổ (shadow) tự nhiên hơn, icon size vừa vặn, không bị lệch." },
+      { id: "td-05", p: "P2", t: "Màn cộng đồng / Buddy pick: Xem pill category và tuỳ chọn giới tính.", e: "Pill hiển thị giống Figma, tuỳ chọn giới tính hoạt động đúng filter." },
+      { id: "td-06", p: "P1", t: "Creator screen: Kiểm tra giao diện danh sách item.", e: "Thẻ card đẹp, nút trắng floating đúng vị trí, ảnh avatar có hiệu ứng blur nâu (brown blur)." },
+    ],
+  },
+  {
     id: "regress",
-    name: "5. Hồi quy chung (chạy mỗi ngày)",
+    name: "6. Hồi quy chung (chạy mỗi ngày)",
     fixed: [
       "Nhóm kiểm tra nhanh trước khi commit / push — không gắn với 1 lỗi cụ thể.",
     ],
