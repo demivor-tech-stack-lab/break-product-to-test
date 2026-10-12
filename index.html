@@ -1,772 +1,865 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="vi">
 <head>
-<meta charset="utf-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>Phá đồ mình làm</title>
-<style>
-  :root {
-    --bg: #f6f7f9;
-    --surface: #ffffff;
-    --surface-2: #f0f2f5;
-    --text: #18191a;
-    --muted: #626466;
-    --border: #e1e4e6;
-    --accent: #675cff;
-    --accent-soft: #ecebff;
-    --pass: #12a150;
-    --pass-soft: #e3f6ea;
-    --fail: #e5484d;
-    --fail-soft: #fde8e8;
-    --skip: #8a8f98;
-    --skip-soft: #eceef1;
-    --p0: #e5484d;
-    --p1: #f5a524;
-    --p2: #8a8f98;
-    --shadow: 0 1px 2px rgba(24, 25, 26, 0.06);
-  }
-  @media (prefers-color-scheme: dark) {
-    :root:not([data-theme="light"]) {
-      --bg: #111214;
-      --surface: #1a1b1e;
-      --surface-2: #23252a;
-      --text: #ecedee;
-      --muted: #a0a4ab;
-      --border: #2e3036;
-      --accent: #8a82ff;
-      --accent-soft: #2a2850;
-      --pass: #3dd68c;
-      --pass-soft: #12321f;
-      --fail: #ff6b6b;
-      --fail-soft: #3a1717;
-      --skip: #9ba1a6;
-      --skip-soft: #2a2c31;
-      --shadow: none;
-    }
-  }
-  :root[data-theme="dark"] {
-    --bg: #111214;
-    --surface: #1a1b1e;
-    --surface-2: #23252a;
-    --text: #ecedee;
-    --muted: #a0a4ab;
-    --border: #2e3036;
-    --accent: #8a82ff;
-    --accent-soft: #2a2850;
-    --pass: #3dd68c;
-    --pass-soft: #12321f;
-    --fail: #ff6b6b;
-    --fail-soft: #3a1717;
-    --skip: #9ba1a6;
-    --skip-soft: #2a2c31;
-    --shadow: none;
-  }
-  * { box-sizing: border-box; }
-  html, body { margin: 0; }
-  body {
-    background: var(--bg);
-    color: var(--text);
-    font: 14px/1.5 -apple-system, "Segoe UI", "Pretendard", "Malgun Gothic", Roboto, sans-serif;
-  }
-  .wrap { max-width: 980px; margin: 0 auto; padding: 20px 16px 80px; }
-  header.top {
-    position: sticky; top: 0; z-index: 5;
-    background: var(--bg);
-    padding: 12px 0 10px;
-    border-bottom: 1px solid var(--border);
-    margin-bottom: 16px;
-  }
-  .row { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
-  .between { justify-content: space-between; }
-  h1 { font-size: 20px; margin: 0; letter-spacing: -0.3px; }
-  .sub { color: var(--muted); font-size: 13px; }
-  input, select, textarea, button {
-    font: inherit; color: inherit;
-  }
-  input[type="date"], input[type="search"], select, textarea, input[type="text"] {
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: 8px;
-    padding: 6px 10px;
-    min-height: 34px;
-  }
-  input[type="search"] { flex: 1 1 200px; min-width: 0; }
-  button {
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: 8px;
-    padding: 6px 12px;
-    min-height: 34px;
-    cursor: pointer;
-  }
-  button:hover { border-color: var(--accent); }
-  button.primary { background: var(--accent); border-color: var(--accent); color: #fff; }
-  button.ghost { background: transparent; }
-  .progress {
-    height: 8px; border-radius: 99px; overflow: hidden;
-    background: var(--surface-2); display: flex; margin: 10px 0 6px;
-  }
-  .progress span { display: block; height: 100%; }
-  .stats { display: flex; gap: 14px; flex-wrap: wrap; font-size: 13px; color: var(--muted); }
-  .stats b { color: var(--text); }
-  .dot { display: inline-block; width: 8px; height: 8px; border-radius: 50%; margin-right: 5px; vertical-align: middle; }
-
-  section.group { margin-bottom: 22px; }
-  .group-head {
-    display: flex; justify-content: space-between; align-items: baseline; gap: 8px;
-    margin: 0 0 8px;
-  }
-  .group-head h2 { font-size: 16px; margin: 0; }
-  .group-head .count { color: var(--muted); font-size: 12px; white-space: nowrap; }
-  .fixed {
-    background: var(--surface-2); border-radius: 10px; padding: 10px 12px;
-    font-size: 13px; color: var(--muted); margin-bottom: 10px;
-  }
-  .fixed summary { cursor: pointer; color: var(--text); font-weight: 600; }
-  .fixed ul { margin: 6px 0 0; padding-left: 18px; }
-
-  .case {
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-left: 4px solid var(--border);
-    border-radius: 10px;
-    padding: 10px 12px;
-    margin-bottom: 8px;
-    box-shadow: var(--shadow);
-  }
-  .case.s-pass { border-left-color: var(--pass); }
-  .case.s-fail { border-left-color: var(--fail); background: linear-gradient(0deg, var(--fail-soft), var(--fail-soft)), var(--surface); }
-  .case.s-skip { border-left-color: var(--skip); opacity: 0.75; }
-  .case-top { display: flex; gap: 10px; align-items: flex-start; justify-content: space-between; }
-  .case-main { min-width: 0; flex: 1; }
-  .title { font-weight: 600; margin: 0 0 2px; overflow-wrap: anywhere; }
-  .expect { color: var(--muted); font-size: 13px; overflow-wrap: anywhere; }
-  .expect::before { content: "Mong đợi: "; font-weight: 600; color: var(--text); }
-  .meta { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 6px; }
-  .chip {
-    font-size: 11px; padding: 1px 8px; border-radius: 99px;
-    background: var(--surface-2); color: var(--muted); border: 1px solid var(--border);
-  }
-  .chip.p0 { color: var(--p0); border-color: var(--p0); background: transparent; }
-  .chip.p1 { color: var(--p1); border-color: var(--p1); background: transparent; }
-  .chip.custom { color: var(--accent); border-color: var(--accent); background: transparent; }
-  .status { display: flex; gap: 4px; flex-shrink: 0; }
-  .status button { min-width: 38px; padding: 4px 8px; font-size: 13px; }
-  .status button[aria-pressed="true"].pass { background: var(--pass); border-color: var(--pass); color: #fff; }
-  .status button[aria-pressed="true"].fail { background: var(--fail); border-color: var(--fail); color: #fff; }
-  .status button[aria-pressed="true"].skip { background: var(--skip); border-color: var(--skip); color: #fff; }
-  .note { width: 100%; margin-top: 8px; resize: vertical; min-height: 34px; font-size: 13px; }
-  .note:placeholder-shown { min-height: 34px; height: 34px; }
-  .del { font-size: 12px; padding: 2px 8px; min-height: 0; margin-top: 6px; color: var(--muted); }
-
-  dialog {
-    border: 1px solid var(--border); border-radius: 12px; padding: 18px;
-    background: var(--surface); color: var(--text);
-    width: min(560px, calc(100vw - 32px));
-  }
-  dialog::backdrop { background: rgba(0, 0, 0, 0.4); }
-  dialog label { display: block; font-size: 13px; font-weight: 600; margin: 10px 0 4px; }
-  dialog input, dialog textarea, dialog select { width: 100%; }
-  dialog textarea { min-height: 70px; }
-  .history { font-size: 13px; }
-  .history li { margin: 2px 0; }
-  .history a { color: var(--accent); cursor: pointer; text-decoration: underline; }
-  .empty { color: var(--muted); text-align: center; padding: 30px 0; }
-  .toast {
-    position: fixed; left: 50%; bottom: 20px; transform: translateX(-50%);
-    background: var(--text); color: var(--bg); padding: 8px 14px; border-radius: 8px;
-    font-size: 13px; opacity: 0; transition: opacity .2s; pointer-events: none;
-  }
-  .toast.show { opacity: 1; }
-  @media (max-width: 560px) {
-    .case-top { flex-direction: column; }
-    .status { align-self: stretch; }
-    .status button { flex: 1; }
-  }
-</style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Cases: Landing Builder</title>
+    <style>
+        body {
+            font-family: system-ui, -apple-system, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background: #f3f4f6;
+            color: #1f2937;
+        }
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            background: white;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+        }
+        h1 {
+            font-size: 24px;
+            border-bottom: 2px solid #e5e7eb;
+            padding-bottom: 15px;
+            margin-bottom: 5px;
+        }
+        .subtitle {
+            font-size: 14px;
+            color: #6b7280;
+            margin-bottom: 20px;
+            line-height: 1.5;
+        }
+        .summary {
+            position: sticky;
+            top: 0;
+            z-index: 2;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            align-items: center;
+            padding: 10px 0;
+            background: white;
+            border-bottom: 1px solid #e5e7eb;
+            font-size: 14px;
+        }
+        .pill {
+            padding: 4px 10px;
+            border-radius: 999px;
+            font-weight: 600;
+        }
+        .pill.pass { background: #d1fae5; color: #047857; }
+        .pill.fail { background: #fee2e2; color: #b91c1c; }
+        .pill.todo { background: #f3f4f6; color: #4b5563; }
+        .pill.skip { background: #fef3c7; color: #92400e; }
+        .summary .spacer { flex: 1; }
+        .filter {
+            padding: 6px 10px;
+            border: 1px solid #d1d5db;
+            border-radius: 6px;
+            background: white;
+            font-size: 13px;
+        }
+        h2 {
+            font-size: 18px;
+            color: #2563eb;
+            margin-top: 35px;
+            border-bottom: 1px solid #e5e7eb;
+            padding-bottom: 8px;
+        }
+        h2 .new {
+            margin-left: 8px;
+            padding: 2px 8px;
+            border-radius: 999px;
+            background: #dbeafe;
+            color: #1d4ed8;
+            font-size: 12px;
+            vertical-align: middle;
+        }
+        .test-case {
+            display: flex;
+            align-items: flex-start;
+            gap: 12px;
+            padding: 15px 10px;
+            border-bottom: 1px dashed #e5e7eb;
+            border-left: 4px solid transparent;
+            transition: background-color 0.2s;
+        }
+        .test-case:hover {
+            background-color: #f9fafb;
+        }
+        .test-case:last-child {
+            border-bottom: none;
+        }
+        .actions {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+            padding-top: 2px;
+        }
+        .mark {
+            width: 30px;
+            height: 30px;
+            border: 2px solid #d1d5db;
+            border-radius: 6px;
+            background: white;
+            color: #9ca3af;
+            font-size: 16px;
+            font-weight: 700;
+            line-height: 1;
+            cursor: pointer;
+        }
+        .mark.pass:hover { border-color: #10b981; color: #10b981; }
+        .mark.fail:hover { border-color: #ef4444; color: #ef4444; }
+        .passed .mark.pass { background: #10b981; border-color: #10b981; color: white; }
+        .failed .mark.fail { background: #ef4444; border-color: #ef4444; color: white; }
+        .mark.skip { font-size: 13px; }
+        .mark.skip:hover { border-color: #d97706; color: #d97706; }
+        .skipped .mark.skip { background: #f59e0b; border-color: #f59e0b; color: white; }
+        .content {
+            flex: 1;
+            min-width: 0;
+        }
+        .content strong {
+            display: block;
+            margin-bottom: 6px;
+            font-size: 16px;
+        }
+        .content span {
+            display: block;
+            font-size: 14px;
+            color: #4b5563;
+            margin-bottom: 8px;
+            line-height: 1.5;
+        }
+        .content em {
+            display: inline-block;
+            font-size: 13px;
+            color: #047857;
+            font-style: normal;
+            background: #d1fae5;
+            padding: 4px 8px;
+            border-radius: 6px;
+            font-weight: 500;
+            line-height: 1.5;
+        }
+        .content .before {
+            display: block;
+            margin-bottom: 8px;
+            font-size: 13px;
+            color: #991b1b;
+            background: #fee2e2;
+            padding: 4px 8px;
+            border-radius: 6px;
+            line-height: 1.5;
+        }
+        .content .steps-label {
+            font-size: 13px;
+            font-weight: 600;
+            color: #374151;
+        }
+        .content ol.steps {
+            margin: 4px 0 8px;
+            padding-left: 22px;
+            font-size: 14px;
+            color: #4b5563;
+            line-height: 1.6;
+        }
+        .content ol.steps code,
+        .content .hint code,
+        .content em code {
+            background: #f3f4f6;
+            color: #111827;
+            padding: 1px 4px;
+            border-radius: 4px;
+            font-size: 12px;
+            word-break: break-all;
+        }
+        .content .hint {
+            display: block;
+            margin-top: 8px;
+            font-size: 13px;
+            color: #92400e;
+            background: #fef3c7;
+            padding: 4px 8px;
+            border-radius: 6px;
+            line-height: 1.5;
+        }
+        .note {
+            display: block;
+            width: 100%;
+            box-sizing: border-box;
+            margin-top: 10px;
+            min-height: 38px;
+            padding: 8px 10px;
+            border: 1px solid #e5e7eb;
+            border-radius: 6px;
+            font: inherit;
+            font-size: 13px;
+            color: #1f2937;
+            resize: vertical;
+        }
+        .note:focus {
+            outline: 2px solid #93c5fd;
+            border-color: #93c5fd;
+        }
+        .passed { border-left-color: #10b981; }
+        .passed .content strong,
+        .passed .content span,
+        .passed .content em {
+            opacity: 0.5;
+            text-decoration: line-through;
+        }
+        .failed {
+            border-left-color: #ef4444;
+            background: #fef2f2;
+        }
+        .failed:hover { background: #fee2e2; }
+        .failed .content strong { color: #b91c1c; }
+        .failed .note { border-color: #fca5a5; background: white; }
+        .skipped { border-left-color: #f59e0b; background: #fffbeb; }
+        .skipped .content { opacity: 0.55; }
+        .skipped .content strong::after {
+            content: "Bỏ qua";
+            margin-left: 8px;
+            padding: 1px 8px;
+            border-radius: 999px;
+            background: #fef3c7;
+            color: #92400e;
+            font-size: 12px;
+            font-weight: 600;
+            vertical-align: middle;
+        }
+        .reset-btn {
+            float: right;
+            padding: 6px 12px;
+            background: #ef4444;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 13px;
+        }
+        .reset-btn:hover {
+            background: #dc2626;
+        }
+        .copy-btn {
+            padding: 6px 12px;
+            border: 1px solid #d1d5db;
+            border-radius: 6px;
+            background: white;
+            cursor: pointer;
+            font-size: 13px;
+        }
+        .copy-btn:hover { background: #f3f4f6; }
+    </style>
 </head>
 <body>
-<div class="wrap">
-  <header class="top">
-    <div class="row between">
-      <div>
-        <h1>Phá đồ mình làm</h1>
-        <div class="sub">Checklist test hằng ngày cho những gì mình vừa làm</div>
-      </div>
-      <div class="row">
-        <label class="sub" for="runDate">Ngày test</label>
-        <input type="date" id="runDate" />
-        <button id="themeBtn" class="ghost" title="Đổi giao diện sáng/tối">◐</button>
-      </div>
-    </div>
-    <div class="progress" id="progress"></div>
-    <div class="stats" id="stats"></div>
-    <div class="row" style="margin-top:10px">
-      <input type="search" id="q" placeholder="Tìm test case…" />
-      <select id="fGroup"><option value="">Tất cả nhóm</option></select>
-      <select id="fPrio">
-        <option value="">Mọi mức</option>
-        <option value="P0">P0 – phải test</option>
-        <option value="P1">P1</option>
-        <option value="P2">P2</option>
-      </select>
-      <select id="fStatus">
-        <option value="">Mọi trạng thái</option>
-        <option value="todo">Chưa test</option>
-        <option value="pass">Đạt</option>
-        <option value="fail">Lỗi</option>
-        <option value="skip">Bỏ qua</option>
-      </select>
-    </div>
-    <div class="row" style="margin-top:8px">
-      <button class="primary" id="addBtn">+ Thêm test case</button>
-      <button id="mdBtn">Copy kết quả (Markdown)</button>
-      <button id="historyBtn">Lịch sử</button>
-      <button id="saveFolderBtn" title="Ghi results.json vào thư mục repo — tác vụ mỗi tối sẽ đẩy lên GitHub">Lưu kết quả vào thư mục</button>
-      <button id="exportBtn">Sao lưu JSON</button>
-      <button id="importBtn">Khôi phục JSON</button>
-      <button id="resetBtn" class="ghost">Xoá kết quả ngày này</button>
-      <input type="file" id="importFile" accept="application/json" hidden />
-    </div>
-  </header>
-
-  <main id="list"></main>
-</div>
-
-<dialog id="addDlg">
-  <form method="dialog" id="addForm">
-    <h2 style="margin:0 0 4px;font-size:17px">Thêm test case</h2>
-    <div class="sub">Lưu trong trình duyệt này. Nhớ “Sao lưu JSON” nếu đổi máy / xoá dữ liệu trình duyệt.</div>
-    <label for="aGroup">Nhóm</label>
-    <input type="text" id="aGroup" list="groupList" required placeholder="vd: 4. Bản đồ 위픽" />
-    <datalist id="groupList"></datalist>
-    <label for="aTitle">Làm gì (thao tác phá)</label>
-    <textarea id="aTitle" required placeholder="vd: Chạm 5 ghim thật nhanh khi đang mất mạng"></textarea>
-    <label for="aExpect">Mong đợi</label>
-    <textarea id="aExpect" required placeholder="vd: Card hiện ghim cuối, có thông báo lỗi mạng, không crash"></textarea>
-    <label for="aPrio">Mức ưu tiên</label>
-    <select id="aPrio"><option>P0</option><option selected>P1</option><option>P2</option></select>
-    <label for="aTags">Tag (cách nhau bằng dấu phẩy)</label>
-    <input type="text" id="aTags" placeholder="vd: android, mạng chậm, khách" />
-    <div class="row" style="justify-content:flex-end;margin-top:14px">
-      <button value="cancel" formnovalidate class="ghost">Huỷ</button>
-      <button value="ok" class="primary" id="addOk">Thêm</button>
-    </div>
-  </form>
-</dialog>
-
-<dialog id="historyDlg">
-  <h2 style="margin:0 0 8px;font-size:17px">Lịch sử các ngày test</h2>
-  <ul class="history" id="historyList"></ul>
-  <div class="row" style="justify-content:flex-end;margin-top:12px">
-    <button class="ghost" onclick="this.closest('dialog').close()">Đóng</button>
-  </div>
-</dialog>
-
-<div class="toast" id="toast"></div>
-
-<script>
-/* =========================================================================
- * DỮ LIỆU — thêm test case cố định ở đây (id phải duy nhất, KHÔNG đổi id cũ
- * vì kết quả từng ngày lưu theo id). Test case thêm trên giao diện lưu riêng
- * trong localStorage (key bwihb:custom).
- * =======================================================================*/
-const GROUPS = [
-  {
-    id: "mycontent",
-    name: "1. 내 콘텐츠 / 위픽",
-    fixed: [
-      "Tab 위픽 / sửa 위픽 / chi tiết 위픽: khôi phục phần code từng làm nhưng chưa được merge.",
-      "Xoá 위픽 → danh sách cập nhật ngay từ chi tiết, menu ⋮ và màn 편집.",
-      "Sửa story: chip danh mục tự sáng đúng kể cả khi category là số, là tên, hoặc rỗng nhưng có danh mục con.",
-      "Sửa story / 여행 상품 / 위픽 từ menu ⋮ ở danh sách → lưu xong mở chi tiết, back mới về danh sách.",
-      "Header chi tiết 위픽 và màn chọn option hết bị đẩy xuống xa mép trên.",
-    ],
-    cases: [
-      { id: "mc-01", p: "P0", t: "Xoá 위픽 từ màn chi tiết → back về danh sách.", e: "Bài biến mất ngay, không nháy lại." },
-      { id: "mc-02", p: "P0", t: "Bật chế độ máy bay → xoá 위픽.", e: "Báo lỗi, bài KHÔNG biến mất khỏi danh sách." },
-      { id: "mc-03", p: "P1", t: "Màn 편집: chọn 3 bài (1 sản phẩm, 1 story, 1 위픽) → xoá cùng lúc → về danh sách.", e: "Cả 3 biến mất, danh sách bên dưới đã cập nhật." },
-      { id: "mc-04", p: "P0", t: "Sửa story từ ⋮ → KHÔNG lưu, bấm back.", e: "Về danh sách, KHÔNG tự mở chi tiết." },
-      { id: "mc-05", p: "P0", t: "Sửa story từ ⋮ → lưu.", e: "Mở chi tiết bài vừa sửa → back về danh sách, không lặp vào chi tiết lần nữa." },
-      { id: "mc-06", p: "P1", t: "Sửa từ MÀN CHI TIẾT → lưu.", e: "Ở lại chi tiết, không chồng thêm một màn chi tiết." },
-      { id: "mc-07", p: "P1", t: "Sửa bài A từ ⋮ → huỷ → sửa bài B từ chi tiết → lưu → quay lại danh sách.", e: "KHÔNG mở chi tiết bài A." },
-      { id: "mc-08", p: "P1", t: "Sửa 여행 상품 từ ⋮ (form EditMyTrip) → lưu.", e: "Mở chi tiết sản phẩm vừa sửa." },
-      { id: "mc-09", p: "P0", t: "Sửa 위픽 từ ⋮ → lưu.", e: "Về 내 콘텐츠 tab 위픽 rồi mở chi tiết; back KHÔNG rơi vào tab bản đồ." },
-      { id: "mc-10", p: "P2", t: "Sửa một story cũ (đăng từ lâu) → xem chip danh mục.", e: "Chip danh mục sáng đúng." },
-      { id: "mc-11", p: "P2", t: "Mở chi tiết 위픽 trên máy có tai thỏ / punch-hole.", e: "Header sát mép trên như các màn khác, không cách xa." },
-    ],
-  },
-  {
-    id: "theme",
-    name: "2. 테마여행 (main → 테마여행 → video → chi tiết)",
-    fixed: [
-      "Sheet 인기테마 theo Figma (bo 16, cao 600, tím #675CFF), bỏ nút làm mới.",
-      "Màn video: header ← ⋮; chạm video phát/dừng + nút loa; phủ tối 10% + gradient; nút 팔로우 kính 2 trạng thái; video phát ngay từ card; vuốt lên mở chi tiết.",
-      "Bài của chính mình: ẩn 팔로우 và không gọi API follow.",
-      "Chia sẻ gửi link bài viết thay vì link file video.",
-      "Chi tiết: có giá (story lấy giá sản phẩm gắn kèm), 예약하기, ⋮ menu, bookmark API thật, avatar mở trang người đăng, khách → gợi ý đăng ký.",
-      "Xem ảnh: hiện trọn ảnh (contain), zoom theo điểm ngón tay, kéo có giới hạn, tối đa 5×.",
-    ],
-    cases: [
-      { id: "th-01", p: "P0", t: "Mở bài CỦA CHÍNH MÌNH ở màn video → ⋮ → 팔로우 취소.", e: "Không có nút 팔로우; không có toast lỗi \"자기 자신을 팔로우할 수 없습니다\"." },
-      { id: "th-02", p: "P1", t: "Bài người khác: bấm 팔로우/팔로잉 thật nhanh 5 lần → thoát ra vào lại.", e: "Trạng thái cuối khớp server. 팔로잉 = nền trắng 40% không viền." },
-      { id: "th-03", p: "P1", t: "Màn video: chạm liên tục 10 lần; bấm nút loa.", e: "Video không kẹt; nút hiện rồi tự ẩn sau ~1s; loa bật/tắt tiếng đúng." },
-      { id: "th-04", p: "P1", t: "Đang phát video → chuyển app khác → quay lại; khoá màn hình → mở lại.", e: "Video không phát tiếng nền khi rời màn; quay lại không crash." },
-      { id: "th-05", p: "P0", t: "Vuốt lên ở GIỮA video; vuốt ngang.", e: "Vuốt lên mở chi tiết; vuốt ngang KHÔNG mở." },
-      { id: "th-06", p: "P1", t: "Bật throttle mạng (emulator: Extended controls → Cellular → chậm) → mở card.", e: "Thumbnail hiện ngay, không đen kèm vòng xoay." },
-      { id: "th-07", p: "P2", t: "Card KHÔNG có video (chỉ ảnh).", e: "Hiện ảnh, không có nút loa/phát, vuốt lên vẫn mở chi tiết." },
-      { id: "th-08", p: "P0", t: "Chia sẻ (⋮ ở màn video và nút chia sẻ ở chi tiết) → mở link trên máy khác / trình duyệt.", e: "Vào BÀI VIẾT, không phải file video. Nút chia sẻ chi tiết không mở chat." },
-      { id: "th-09", p: "P0", t: "Chi tiết STORY có gắn sản phẩm → bấm 예약하기.", e: "Có thanh giá; mở màn option hoặc trang sản phẩm." },
-      { id: "th-10", p: "P1", t: "Chi tiết STORY không gắn sản phẩm.", e: "Không có thanh giá, không crash." },
-      { id: "th-11", p: "P1", t: "Sản phẩm HẾT HẠN BÁN → 예약하기.", e: "Báo hết thời gian bán, không mở màn đặt." },
-      { id: "th-12", p: "P2", t: "Sản phẩm 카페·음식.", e: "Không có thanh 예약하기." },
-      { id: "th-13", p: "P0", t: "Khách chưa đăng nhập: bookmark, nhắn tin, ⋮ → 메시지.", e: "Hiện gợi ý đăng ký, KHÔNG vào chat, không gọi API lỗi im lặng." },
-      { id: "th-14", p: "P1", t: "Bookmark ở chi tiết → back về danh sách.", e: "Card ở danh sách đổi trạng thái theo." },
-      { id: "th-15", p: "P1", t: "Bookmark bật/tắt nhanh 6 lần → thoát vào lại.", e: "Trạng thái + số đếm đúng, không âm." },
-      { id: "th-16", p: "P1", t: "⋮ → 신고 (cả màn video và chi tiết).", e: "Mở màn báo cáo thật (không chỉ toast)." },
-      { id: "th-17", p: "P1", t: "Chi tiết: bấm avatar / tên người đăng (bài người khác và bài của mình).", e: "Người khác → trang người đăng; của mình → không làm gì." },
-      { id: "th-18", p: "P0", t: "Xem ảnh dọc và ảnh ngang.", e: "Thấy TRỌN ảnh (không bị cắt)."  },
-      { id: "th-19", p: "P1", t: "Chụm zoom ở góc ảnh; kéo ảnh ra hết mép rồi thả.", e: "Góc đó giữ dưới ngón tay; thả tay ảnh trượt về, không lộ khoảng trống." },
-      { id: "th-20", p: "P1", t: "Chưa zoom: vuốt ngang. Đã zoom: vuốt ngang.", e: "Chưa zoom → chuyển ảnh; đã zoom → kéo ảnh, không chuyển." },
-      { id: "th-21", p: "P2", t: "Chạm đúp ảnh rồi chạm đúp lần nữa.", e: "Zoom 2.5× đúng chỗ chạm, rồi thu về." },
-      { id: "th-22", p: "P2", t: "Sheet 인기테마: chọn theme, kéo sheet xuống đóng.", e: "Không có nút ↻; theme đang chọn nền #675CFF chữ Medium." },
-    ],
-  },
-  {
-    id: "home",
-    name: "3. Màn main / 퀵메뉴 / thẻ danh sách",
-    fixed: [
-      "Bookmark kính tròn 32 ở section sản phẩm, nội dung phổ biến, magazine.",
-      "Nút cuộn lên đầu trang bỏ vòng xám; không chạy ngầm khi màn không dùng.",
-      "해외여행: back không nháy đen; chọn thành phố quay về đúng màn; ＋ mở menu; 3 loại bookmark hoạt động.",
-      "Banner sự kiện: chuông / tìm kiếm mở màn trong tab Home.",
-      "Bookmark main / 음식…: API lỗi thì hoàn tác; 409/404 coi là thành công; khách → gợi ý đăng ký.",
-      "Thẻ danh sách theo thiết kế mới (ảnh 361:360, bỏ mọi bóng) cho 7 màn; skeleton mới; màn 음식 khoảng trống 12 / 32 / 24.",
-    ],
-    cases: [
-      { id: "hm-01", p: "P0", t: "main → 해외여행 → back 10 lần liên tục (cả lúc đã cuộn và chưa cuộn).", e: "Hàng tab thành phố KHÔNG nháy đen." },
-      { id: "hm-02", p: "P0", t: "해외여행 → 🔍 → chọn thành phố → back.", e: "Về MÀN MAIN, không về màn tìm kiếm; thành phố đã chọn được áp dụng." },
-      { id: "hm-03", p: "P1", t: "Lặp hm-02 ba lần rồi back liên tục.", e: "Stack không nhân bản màn 해외여행." },
-      { id: "hm-04", p: "P1", t: "해외여행: bookmark ở carousel và ở danh sách → mở 인기 액티비티.", e: "Cùng sản phẩm, cùng trạng thái bookmark." },
-      { id: "hm-05", p: "P0", t: "Bookmark khi MẤT MẠNG (main, 해외여행, 음식).", e: "Nút tự trả về trạng thái cũ + báo lỗi." },
-      { id: "hm-06", p: "P1", t: "Bookmark một bài đã bookmark từ thiết bị khác (409).", e: "Giữ trạng thái đã bookmark, không nhảy về." },
-      { id: "hm-07", p: "P0", t: "Khách chưa đăng nhập: bookmark ở main, 해외여행, 음식.", e: "Hiện gợi ý đăng ký." },
-      { id: "hm-08", p: "P1", t: "해외여행: bấm ＋.", e: "Mở menu (위픽 요청, đăng bài…)." },
-      { id: "hm-09", p: "P0", t: "Vào màn 음식, quan sát lúc đang tải.", e: "Skeleton gần vuông, avatar trên-trái, bookmark tròn trên-phải; khi dữ liệu về bố cục KHÔNG nhảy." },
-      { id: "hm-10", p: "P1", t: "Màn 음식: đo khoảng cách (so thiết kế).", e: "App bar → thẻ đầu 12; giữa thẻ 32; thẻ cuối → tab bar 24; không bóng thẻ." },
-      { id: "hm-11", p: "P1", t: "Dữ liệu xấu: tiêu đề 3–4 dòng, giá ₩ 12,345,000, rating 0, không ảnh, không avatar.", e: "Không vỡ bố cục; tiêu đề tối đa 2 dòng có …"  },
-      { id: "hm-12", p: "P0", t: "Mở 6 màn còn lại dùng chung thẻ: 해외여행, 인기 액티비티, 핫 액티비티, 오늘 가능한 체험, sản phẩm người bán, kết quả tìm kiếm.", e: "Không màn nào vỡ bố cục; bookmark ở góc trên-phải." },
-      { id: "hm-13", p: "P1", t: "Màn main: cuộn xuống để hiện nút ↑; mở các màn khác có ＋.", e: "Nút ↑ là kính mờ, không vòng xám; ＋ ở các màn khác vẫn bấm được." },
-      { id: "hm-14", p: "P2", t: "Banner sự kiện → chuông → back; → tìm kiếm → back.", e: "Ở lại tab Home; tab bar ẩn khi tìm kiếm." },
-      { id: "hm-15", p: "P2", t: "Section sản phẩm / nội dung phổ biến / magazine trên ảnh sáng.", e: "Nút bookmark kính tròn 32 nhìn rõ viền." },
-    ],
-  },
-  {
-    id: "map",
-    name: "4. Bản đồ 위픽",
-    fixed: [
-      "Màn chọn vị trí: chạm vào đâu ghim nằm đó, bản đồ không trượt và không đổi zoom; kéo thả ghim cũng vậy. Có log debug.",
-      "Bản đồ chính vẽ bằng GPU thay vì CPU; header Android dùng nền kính tĩnh.",
-      "Bỏ render và gọi API thừa mỗi lần chạm ghim, id ghim ổn định, bỏ log nặng.",
-    ],
-    cases: [
-      { id: "mp-01", p: "P0", t: "Header bản đồ trên Android.", e: "Nền trắng mờ dần, không đen/trống. Kéo sheet 요청 목록 lên tối đa → header nền đặc." },
-      { id: "mp-02", p: "P0", t: "Kéo / zoom bản đồ chính (đo bằng adb shell dumpsys gfxinfo <package>).", e: "Mượt hơn trước (trước: 91% khung hình giật)." },
-      { id: "mp-03", p: "P0", t: "Chạm 5 ghim 위픽 khác nhau thật nhanh.", e: "Card cuối là ghim cuối; không crash; không nháy toàn bộ ghim." },
-      { id: "mp-04", p: "P2", t: "Ghim 위픽 thiếu id (nếu có dữ liệu như vậy).", e: "Ghim không nhảy / nhân đôi khi chạm." },
-      { id: "mp-05", p: "P1", t: "Zoom vào/ra liên tục rồi chạm ghim (máy thật).", e: "Nhãn ghim không vỡ thành chữ đen." },
-      { id: "mp-06", p: "P0", t: "Chọn vị trí: zoom tới level 2 → chạm 3 điểm khác nhau.", e: "Zoom giữ nguyên; ghim đúng chỗ chạm; bản đồ không trượt." },
-      { id: "mp-07", p: "P0", t: "Chọn vị trí: chưa zoom lần nào → chạm ngay.", e: "Zoom KHÔNG đổi." },
-      { id: "mp-08", p: "P1", t: "Chạm bản đồ → rồi chọn địa điểm từ DANH SÁCH tìm kiếm.", e: "Bản đồ PHẢI trượt tới địa điểm đó." },
-      { id: "mp-09", p: "P1", t: "Kéo ghim thả ra sát mép màn.", e: "Bản đồ không nhảy; ghim nằm đúng chỗ thả." },
-      { id: "mp-10", p: "P2", t: "Chạm trúng toà nhà có nhiều cửa hàng.", e: "Mở danh sách chọn cửa hàng." },
-      { id: "mp-11", p: "P2", t: "Xem log debug của màn chọn vị trí trong lúc test mp-06…mp-09.", e: "Có đủ chuỗi log chạm → xử lý → bỏ qua dời bản đồ." },
-    ],
-  },
-  {
-    id: "updates_today",
-    name: "5. Các cập nhật hôm nay (Cafe/Food, UI, Creator)",
-    fixed: [
-      "Thêm bước cấu hình sức chứa (MaxPeopleStep) cho reservation của Cafe/Food.",
-      "Fix CSS bóng đổ và kích thước icon ở header, nút floating ở màn hình chính.",
-      "Cập nhật category pill ở màn cộng đồng khớp với Figma và filter giới tính buddy-pick.",
-      "Cập nhật UI màn Creator (nút floating trắng, avatar blur nâu, card item).",
-    ],
-    cases: [
-      { id: "td-01", p: "P0", t: "Đăng ký Cafe/Food: Đi tới bước Số người.", e: "Có màn hình nhập 'Tổng số người' (tối thiểu 1) sau bước chọn thời gian." },
-      { id: "td-02", p: "P1", t: "Đăng ký Cafe/Food: Nhập số người và Lưu nháp.", e: "Lưu nháp thành công, reload lại vẫn giữ đúng số người đã nhập." },
-      { id: "td-03", p: "P0", t: "Đặt bàn Cafe/Food: Khách xem khung giờ đã đạt giới hạn.", e: "Khung giờ đó bị làm mờ (closed / 마감) và không thể bấm chọn." },
-      { id: "td-04", p: "P2", t: "Màn hình chính: Kiểm tra header và nút nổi (floating button).", e: "Bóng đổ (shadow) tự nhiên hơn, icon size vừa vặn, không bị lệch." },
-      { id: "td-05", p: "P2", t: "Màn cộng đồng / Buddy pick: Xem pill category và tuỳ chọn giới tính.", e: "Pill hiển thị giống Figma, tuỳ chọn giới tính hoạt động đúng filter." },
-      { id: "td-06", p: "P1", t: "Creator screen: Kiểm tra giao diện danh sách item.", e: "Thẻ card đẹp, nút trắng floating đúng vị trí, ảnh avatar có hiệu ứng blur nâu (brown blur)." },
-    ],
-  },
-  {
-    id: "regress",
-    name: "6. Hồi quy chung (chạy mỗi ngày)",
-    fixed: [
-      "Nhóm kiểm tra nhanh trước khi commit / push — không gắn với 1 lỗi cụ thể.",
-    ],
-    cases: [
-      { id: "rg-01", p: "P0", t: "Reload app (nhấn r trong cửa sổ Metro) rồi mở màn 음식.", e: "Thấy thẻ MỚI (bookmark góc trên-phải). Nếu thấy thẻ cũ = app chưa nạp code mới." },
-      { id: "rg-02", p: "P0", t: "Chạy type-check của dự án.", e: "Không có lỗi trong src." },
-      { id: "rg-03", p: "P1", t: "Đăng xuất → dùng chế độ khách đi qua main, 테마여행, 해외여행, bản đồ.", e: "Không crash, không request 401 lặp, mọi nút cần đăng nhập đều hiện gợi ý." },
-      { id: "rg-04", p: "P1", t: "Bật chế độ máy bay giữa chừng ở mỗi màn đã sửa.", e: "Không crash, có thông báo lỗi hợp lý." },
-      { id: "rg-05", p: "P2", t: "Đổi cỡ chữ hệ thống lớn nhất.", e: "Nút 팔로우 / chip / thẻ không cắt chữ khó đọc." },
-      { id: "rg-06", p: "P2", t: "git status trước khi commit.", e: "Không add nhầm file dở dang của việc khác." },
-    ],
-  },
-];
-
-/* =========================================================================
- * Lưu trữ
- * =======================================================================*/
-const KEY_RUN = (d) => `bwihb:run:${d}`;
-const KEY_CUSTOM = "bwihb:custom";
-const KEY_THEME = "bwihb:theme";
-const KEY_FILTER = "bwihb:filter";
-
-const store = {
-  get(k, fallback) {
-    try { const v = localStorage.getItem(k); return v == null ? fallback : JSON.parse(v); }
-    catch (e) { return fallback; }
-  },
-  set(k, v) {
-    try { localStorage.setItem(k, JSON.stringify(v)); return true; }
-    catch (e) { toast("Không lưu được (trình duyệt chặn bộ nhớ?)"); return false; }
-  },
-  del(k) { try { localStorage.removeItem(k); } catch (e) {} },
-  keys() { try { return Object.keys(localStorage); } catch (e) { return []; } },
-};
-
-const todayStr = () => {
-  const d = new Date();
-  const p = (n) => String(n).padStart(2, "0");
-  return `${d.getFullYear()}-${p(d.getMonth() + 1)}-${p(d.getDate())}`;
-};
-
-let runDate = todayStr();
-let run = {};          // { caseId: { s: 'pass'|'fail'|'skip', n: 'note' } }
-let custom = store.get(KEY_CUSTOM, []); // [{id, g, t, e, p, tags}]
-
-function allGroups() {
-  const groups = GROUPS.map((g) => ({ ...g, cases: [...g.cases] }));
-  for (const c of custom) {
-    let g = groups.find((x) => x.name === c.g);
-    if (!g) { g = { id: "c-" + c.g, name: c.g, fixed: [], cases: [] }; groups.push(g); }
-    g.cases.push({ id: c.id, p: c.p, t: c.t, e: c.e, tags: c.tags || [], custom: true });
-  }
-  return groups;
-}
-
-/* =========================================================================
- * Render
- * =======================================================================*/
-const $ = (s) => document.querySelector(s);
-const esc = (s) => String(s ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
-
-function loadRun() {
-  run = store.get(KEY_RUN(runDate), {});
-}
-function saveRun() {
-  const clean = {};
-  for (const [k, v] of Object.entries(run)) if (v && (v.s || v.n)) clean[k] = v;
-  if (Object.keys(clean).length) store.set(KEY_RUN(runDate), clean); else store.del(KEY_RUN(runDate));
-}
-
-function render() {
-  const q = $("#q").value.trim().toLowerCase();
-  const fg = $("#fGroup").value, fp = $("#fPrio").value, fs = $("#fStatus").value;
-  store.set(KEY_FILTER, { fg, fp, fs });
-  const groups = allGroups();
-
-  // group select + datalist
-  const gs = $("#fGroup");
-  const cur = gs.value;
-  gs.innerHTML = '<option value="">Tất cả nhóm</option>' + groups.map((g) => `<option value="${esc(g.id)}">${esc(g.name)}</option>`).join("");
-  gs.value = cur;
-  $("#groupList").innerHTML = groups.map((g) => `<option value="${esc(g.name)}">`).join("");
-
-  let total = 0, pass = 0, fail = 0, skip = 0;
-  const html = [];
-  for (const g of groups) {
-    const all = g.cases;
-    for (const c of all) {
-      total++;
-      const s = run[c.id]?.s;
-      if (s === "pass") pass++; else if (s === "fail") fail++; else if (s === "skip") skip++;
-    }
-    if (fg && g.id !== fg) continue;
-    const visible = all.filter((c) => {
-      const s = run[c.id]?.s || "todo";
-      if (fp && c.p !== fp) return false;
-      if (fs && s !== fs) return false;
-      if (q) {
-        const hay = [c.t, c.e, (c.tags || []).join(" "), run[c.id]?.n, c.id].join(" ").toLowerCase();
-        if (!hay.includes(q)) return false;
-      }
-      return true;
-    });
-    if (!visible.length) continue;
-    const done = all.filter((c) => run[c.id]?.s).length;
-    html.push(`<section class="group"><div class="group-head"><h2>${esc(g.name)}</h2><span class="count">${done}/${all.length} đã test</span></div>`);
-    if (g.fixed && g.fixed.length) {
-      html.push(`<details class="fixed"><summary>Đã sửa trong nhóm này (${g.fixed.length})</summary><ul>${g.fixed.map((f) => `<li>${esc(f)}</li>`).join("")}</ul></details>`);
-    }
-    for (const c of visible) {
-      const r = run[c.id] || {};
-      const s = r.s || "";
-      const tags = (c.tags || []).map((t) => `<span class="chip">${esc(t)}</span>`).join("");
-      html.push(`<article class="case ${s ? "s-" + s : ""}" data-id="${esc(c.id)}">
-        <div class="case-top">
-          <div class="case-main">
-            <p class="title">${esc(c.t)}</p>
-            <div class="expect">${esc(c.e)}</div>
-            <div class="meta"><span class="chip ${c.p.toLowerCase()}">${esc(c.p)}</span><span class="chip">${esc(c.id)}</span>${c.custom ? '<span class="chip custom">tự thêm</span>' : ""}${tags}</div>
-          </div>
-          <div class="status" role="group" aria-label="Trạng thái">
-            <button class="pass" data-s="pass" aria-pressed="${s === "pass"}" title="Đạt">✓</button>
-            <button class="fail" data-s="fail" aria-pressed="${s === "fail"}" title="Lỗi">✗</button>
-            <button class="skip" data-s="skip" aria-pressed="${s === "skip"}" title="Bỏ qua">–</button>
-          </div>
+    <div class="container">
+        <button class="reset-btn" onclick="resetAll()">Xóa lịch sử đánh dấu</button>
+        <h1>🛠️ Test Cases: Landing Builder Editor</h1>
+        <div class="subtitle">
+            Cập nhật: 09/10/2026 — trang <code>/landing-builder/[id]</code>.
+            Bấm <b>✓</b> nếu đạt, <b>✕</b> nếu lỗi (failed), <b>⏭</b> để bỏ qua mục chưa cần test, và ghi lỗi vào ô ghi chú bên dưới mỗi mục.
+            Trạng thái và ghi chú tự lưu trên trình duyệt của bạn.
         </div>
-        <textarea class="note" placeholder="Ghi chú: thiết bị, log, ảnh chụp, cách tái hiện lỗi…">${esc(r.n || "")}</textarea>
-        ${c.custom ? '<button class="del ghost" data-del="1">Xoá test case này</button>' : ""}
-      </article>`);
-    }
-    html.push(`</section>`);
-  }
-  $("#list").innerHTML = html.join("") || '<div class="empty">Không có test case khớp bộ lọc.</div>';
 
-  const todo = total - pass - fail - skip;
-  const pct = (n) => (total ? (n / total) * 100 : 0);
-  $("#progress").innerHTML =
-    `<span style="width:${pct(pass)}%;background:var(--pass)"></span>` +
-    `<span style="width:${pct(fail)}%;background:var(--fail)"></span>` +
-    `<span style="width:${pct(skip)}%;background:var(--skip)"></span>`;
-  $("#stats").innerHTML =
-    `<span><span class="dot" style="background:var(--pass)"></span>Đạt <b>${pass}</b></span>` +
-    `<span><span class="dot" style="background:var(--fail)"></span>Lỗi <b>${fail}</b></span>` +
-    `<span><span class="dot" style="background:var(--skip)"></span>Bỏ qua <b>${skip}</b></span>` +
-    `<span><span class="dot" style="background:var(--border)"></span>Chưa test <b>${todo}</b></span>` +
-    `<span>Tổng <b>${total}</b> · ${Math.round(pct(pass + fail + skip))}% đã chạy</span>`;
-}
+        <div class="summary">
+            <span class="pill pass" id="count-pass">0 đạt</span>
+            <span class="pill fail" id="count-fail">0 lỗi</span>
+            <span class="pill todo" id="count-todo">0 chưa test</span>
+            <span class="pill skip" id="count-skip">0 bỏ qua</span>
+            <span class="spacer"></span>
+            <select class="filter" id="filter" aria-label="Lọc">
+                <option value="all">Hiện tất cả</option>
+                <option value="todo">Chỉ chưa test</option>
+                <option value="failed">Chỉ lỗi</option>
+                <option value="skipped">Chỉ mục bỏ qua</option>
+                <option value="active">Ẩn mục bỏ qua</option>
+                <option value="noted">Chỉ mục có ghi chú</option>
+            </select>
+            <button class="copy-btn" onclick="copyFailed()">Copy danh sách lỗi</button>
+        </div>
 
-/* =========================================================================
- * Sự kiện
- * =======================================================================*/
-$("#list").addEventListener("click", (ev) => {
-  const btn = ev.target.closest("button");
-  if (!btn) return;
-  const card = btn.closest(".case");
-  if (!card) return;
-  const id = card.dataset.id;
-  if (btn.dataset.del) {
-    if (!confirm("Xoá test case tự thêm này? (kết quả các ngày vẫn giữ)")) return;
-    custom = custom.filter((c) => c.id !== id);
-    store.set(KEY_CUSTOM, custom);
-    render();
-    return;
-  }
-  const s = btn.dataset.s;
-  if (!s) return;
-  run[id] = run[id] || {};
-  run[id].s = run[id].s === s ? undefined : s;
-  saveRun();
-  render();
-});
+        <div id="sections"></div>
+    </div>
 
-let noteTimer;
-$("#list").addEventListener("input", (ev) => {
-  if (!ev.target.classList.contains("note")) return;
-  const id = ev.target.closest(".case").dataset.id;
-  run[id] = run[id] || {};
-  run[id].n = ev.target.value;
-  clearTimeout(noteTimer);
-  noteTimer = setTimeout(saveRun, 300);
-});
+    <script>
+        // Mỗi mục: [id, tiêu đề, thao tác, mong đợi, gợi ý (tùy chọn)]
+        const sections = [
+            {
+                "title": "0. ĐÃ SỬA trên nhánh fix/edit-template — các bước kiểm tra",
+                "isNew": true,
+                "cases": [
+                    [
+                        "fx-1",
+                        "Sửa 1: Báo lỗi không còn kẹt trên trang danh sách sau khi bấm 취소",
+                        [
+                            "Mở <code>http://127.0.0.1:3000/landing-builder</code> → tab <b>템플릿 모음</b>.",
+                            "Bấm <b>이 템플릿 사용</b> ở một template bất kỳ.",
+                            "Nhập tên trang, ở ô 페이지 주소 nhập một địa chỉ <b>đã có</b> (vd <code>test-tpl-cafe-1009</code>), bấm <b>초안 만들기</b>.",
+                            "Thấy dòng báo lỗi đỏ trong hộp. Bấm <b>취소</b>.",
+                            "Nhìn trang danh sách phía sau."
+                        ],
+                        "Hộp đóng lại và KHÔNG còn dòng báo lỗi nào trên trang danh sách.",
+                        "File: LandingBuilder.tsx (nút 취소 xóa luôn thông báo).",
+                        "dòng lỗi vẫn hiện trên trang danh sách sau khi đã hủy."
+                    ],
+                    [
+                        "fx-2",
+                        "Sửa 2: Thông báo khi trùng địa chỉ trang dễ hiểu",
+                        [
+                            "Làm lại bước 1–3 của Sửa 1 (tạo trang với địa chỉ đã có).",
+                            "Đọc nội dung dòng báo lỗi."
+                        ],
+                        "Báo: <b>\"이미 사용 중인 페이지 주소입니다. 다른 주소를 입력해 주세요.\"</b>",
+                        "File: lib/landing/server.ts.",
+                        "\"페이지 주소 또는 신청 번호가 이미 존재합니다.\" (nhắc cả 신청 번호, khó hiểu)."
+                    ],
+                    [
+                        "fx-3",
+                        "Sửa 3: Ô 페이지 주소 tự đổi chữ thành địa chỉ hợp lệ",
+                        [
+                            "Mở hộp tạo trang (<b>이 템플릿 사용</b>).",
+                            "Gõ lần lượt vào ô 페이지 주소 (xóa ô giữa mỗi lần): <code>TEST_tpl cafe 1009</code> · <code>Tour 2026 Đà Nẵng</code> · <code>Café Crème</code> · <code>a--b</code>.",
+                            "Gõ <code>travel-</code> rồi bấm ra ngoài ô.",
+                            "Làm lại với ô địa chỉ ở bước cuối của <b>AI 랜딩</b> wizard (nếu AI đã cấu hình)."
+                        ],
+                        "Lần lượt thành <code>test-tpl-cafe-1009</code> · <code>tour-2026-da-nang</code> · <code>cafe-creme</code> · <code>a-b</code>; <code>travel-</code> thành <code>travel</code> khi rời ô. Cả 2 nơi giống nhau.",
+                        "File: builder/ui.tsx (toSlug), LandingBuilder.tsx, AIWizard.tsx.",
+                        "dấu cách và _ bị xóa âm thầm (<code>testtplcafe1009</code>), chữ có dấu bị mất (<code>Đà Nẵng</code> → <code>nng</code>)."
+                    ],
+                    [
+                        "fx-4",
+                        "Sửa 4: AI wizard — chọn style 볼드 / 소프트 / 클래식 / 테크 tạo được trang",
+                        [
+                            "Mở <code>http://127.0.0.1:3000/landing-builder</code> → <b>랜딩 페이지 만들기</b> → <b>AI 랜딩</b> (cần AI đã cấu hình).",
+                            "Ở tab template, bấm <b>이 템플릿 사용</b> ở template <b>카페 · 레스토랑</b>.",
+                            "Điền brief; ở bước <b>구성 · 디자인</b> chọn 디자인 스타일 = <b>소프트</b>; điền tên + địa chỉ, tạo trang.",
+                            "Trong editor: Page Setup → 디자인 스타일 xem style nào đang chọn; cột trái xem danh sách block.",
+                            "Làm lại với 볼드, 클래식, 테크 và \"AI가 선택\"."
+                        ],
+                        "Tạo được trang với mọi style (không báo lỗi). Style trong Page Setup đúng style đã chọn. Bộ block theo template 카페.",
+                        "File: lib/landing/design.ts, api/admin/landing-pages/route.ts, LandingBuilder.tsx. Claude đã test qua API (카페 + 소프트 → đúng); chưa chạy AI thật.",
+                        "chọn 볼드/소프트/클래식/테크 → \"올바른 템플릿을 선택해 주세요.\" và KHÔNG tạo được trang; chọn template 카페 → bị tạo thành template 에디토리얼."
+                    ],
+                    [
+                        "fx-5",
+                        "Sửa 5: Sửa tên thương hiệu trực tiếp trên khung giữa",
+                        [
+                            "Mở một trang trong editor (trang chưa có logo ở 상단 메뉴).",
+                            "Bấm vào tên thương hiệu trên thanh menu đầu trang, gõ tên mới.",
+                            "Cuộn xuống footer: xem tên thương hiệu và dòng ©.",
+                            "Bấm vào tên ở footer, sửa tiếp. Nhấn Ctrl+Z.",
+                            "Bấm <b>초안 저장</b>, rồi F5."
+                        ],
+                        "Gõ được ở cả thanh menu và footer; sửa 1 chỗ thì chỗ kia và dòng © đổi theo; Ctrl+Z hoàn tác được; sau F5 vẫn giữ tên mới.",
+                        "File: sections.tsx (Brand), LandingNav.tsx, LandingRenderer.tsx, Editor.tsx.",
+                        "bấm vào tên thương hiệu không sửa được, phải vào Page Setup."
+                    ],
+                    [
+                        "fx-6",
+                        "Sửa 6: Sửa SĐT / email / địa chỉ ở footer trực tiếp",
+                        [
+                            "Trong editor, bấm chọn block <b>하단 정보</b> (footer).",
+                            "Bấm vào số điện thoại, sửa thành <code>02-123-4567</code>. Dòng đang trống (email / địa chỉ) hiện ô nhập khi block được chọn → gõ thử.",
+                            "Chọn block khác: dòng trống ẩn đi, dòng có chữ vẫn hiện.",
+                            "Gõ SĐT sai <code>abc</code> rồi <b>초안 저장</b> → đọc thông báo; sửa lại cho đúng rồi lưu.",
+                            "Bấm <b>미리보기</b>, bấm vào số điện thoại."
+                        ],
+                        "Sửa được trực tiếp; bấm vào số trong editor KHÔNG mở trình gọi điện; SĐT sai → \"전화번호를 확인해 주세요.\"; trong 미리보기 SĐT / email là link bấm được.",
+                        "File: sections.tsx (Footer).",
+                        "bấm vào SĐT / email / địa chỉ ở footer không sửa được."
+                    ],
+                    [
+                        "fx-7",
+                        "Sửa 7: Sửa chữ trên nút gửi của form trực tiếp",
+                        [
+                            "Trong editor, bấm chọn block <b>문의 양식</b>.",
+                            "Bấm vào chữ trên nút gửi (\"신청하기\"…), gõ <code>무료 상담 신청</code>, nhấn Enter.",
+                            "Làm lại trên <b>Firefox</b> nếu có.",
+                            "Bấm <b>미리보기</b>, xem nút và bấm thử."
+                        ],
+                        "Gõ được (Chrome và Firefox); Enter không xuống dòng, không gửi form; trong 미리보기 nút hiện chữ mới và là nút gửi thật (báo \"미리보기입니다…\").",
+                        "File: sections.tsx, LeadForm.tsx (trong editor nút là khung thường để gõ được). Claude mới test Chrome.",
+                        "bấm vào chữ trên nút gửi không sửa được."
+                    ],
+                    [
+                        "fx-8",
+                        "Sửa 8: Sửa danh sách tính năng trong bảng giá trực tiếp",
+                        [
+                            "Trong editor bấm <b>구역 추가</b> → nhóm <b>전환</b> → <b>요금제 요금 카드</b>.",
+                            "Bấm vào danh sách tính năng của 1 gói (dưới giá), sửa: mỗi dòng 1 tính năng, Enter để thêm dòng.",
+                            "Bấm <b>미리보기</b>, xem gói đó.",
+                            "Đổi layout block sang <b>요금 목록</b> (thanh công cụ trên block) rồi xem lại trong 미리보기."
+                        ],
+                        "Sửa được trực tiếp, mỗi dòng 1 tính năng. 미리보기 kiểu 카드: danh sách có dấu ✓ đúng từng dòng; kiểu 목록: các tính năng nối bằng \" · \".",
+                        "File: sections.tsx (Pricing), Landing.module.css. Claude đã test kiểu 카드.",
+                        "danh sách tính năng không sửa được trên khung giữa."
+                    ],
+                    [
+                        "fx-9",
+                        "Sửa 9: Xuất bản lại KHÔNG làm mất 문의 của khách đang mở trang",
+                        [
+                            "Xuất bản một trang có form (đã thay hết chữ mẫu, có SĐT footer, có link chính sách).",
+                            "Mở trang công khai <code>/lp/{địa chỉ}</code> trong <b>cửa sổ ẩn danh</b> (vai khách), điền form nhưng CHƯA gửi.",
+                            "Ở editor: sửa tiêu đề hero, bấm <b>게시하기</b>.",
+                            "Quay lại cửa sổ khách, bấm gửi (KHÔNG tải lại trang).",
+                            "Vào tab <b>받은 문의</b> kiểm tra."
+                        ],
+                        "Khách gửi thành công (\"신청이 접수되었습니다…\"), 문의 xuất hiện trong 받은 문의.",
+                        "File: api/landing-pages/[slug]/leads/route.ts. Claude đã test qua API.",
+                        "khách nhận \"페이지가 수정되었습니다. 다시 불러온 뒤 신청해 주세요.\" → phải tải lại và điền lại từ đầu → mất lead mỗi lần chủ trang 게시하기."
+                    ],
+                    [
+                        "fx-10",
+                        "Sửa 9b: Xuất bản lại có thêm câu hỏi bắt buộc / thay form",
+                        [
+                            "Như Sửa 9 bước 1–2 (khách điền form, chưa gửi).",
+                            "Ở editor: chọn block 문의 양식 → cột phải thêm 1 câu hỏi <b>bắt buộc</b> → <b>게시하기</b>.",
+                            "Khách bấm gửi (chưa tải lại). Đọc thông báo.",
+                            "Khách tải lại trang, điền câu hỏi mới, gửi.",
+                            "Lặp lại, nhưng ở bước 2 xóa block 문의 양식 rồi thêm block 문의 양식 mới."
+                        ],
+                        "Bước 3: báo rõ \"「tên câu hỏi」 항목을 입력해 주세요.\", dữ liệu đã điền vẫn còn. Bước 4: gửi được. Bước 5: báo \"페이지가 수정되었습니다…\" (form cũ không còn nên phải tải lại — đúng).",
+                        "Lưu ý: form bản cũ không hiện câu hỏi mới cho tới khi tải lại — xem trải nghiệm có chấp nhận được không.",
+                        ""
+                    ],
+                    [
+                        "fx-11",
+                        "Sửa 10: Spam KHÔNG còn chặn được khách thật",
+                        [
+                            "Xuất bản 1 trang có form, mở trang công khai.",
+                            "Nhấn F12 → tab <b>Console</b>, dán đoạn sau rồi Enter (gửi 100 request rác):<br><code>for (let i = 1; i <= 100; i++) { const r = await fetch(location.pathname.replace('/lp/', '/api/landing-pages/') + '/leads', { method: 'POST', headers: { 'content-type': 'application/json' }, body: '{}' }); console.log(i, r.status); }</code>",
+                            "Ngay sau đó, điền form trên trang và bấm gửi như khách bình thường.",
+                            "(Giới hạn theo IP) Dán đoạn sau — giả làm 1 IP spam:<br><code>for (let i = 1; i <= 25; i++) { const r = await fetch(location.pathname.replace('/lp/', '/api/landing-pages/') + '/leads', { method: 'POST', headers: { 'content-type': 'application/json', 'x-real-ip': '203.0.113.9' }, body: '{}' }); console.log(i, r.status); }</code>"
+                        ],
+                        "Bước 2: đều 400 (trên máy local, IP 127.0.0.1 không bị giới hạn theo IP). Bước 3: khách gửi THÀNH CÔNG. Bước 4: 20 lượt đầu 400, từ lượt 21 là 429 — chỉ IP spam đó bị chặn.",
+                        "File: lib/landing/server.ts (clientIp), leads/route.ts. Trên production cần nginx gửi X-Real-IP (xem TC 10.15).",
+                        "100 request rác → khách thật nhận \"요청이 너무 많습니다\" (429) suốt 1 phút — ai cũng chặn được toàn bộ 문의 của 1 trang."
+                    ],
+                    [
+                        "fx-12",
+                        "Sửa 11: Bật Google Dịch / extension KHÔNG còn làm sập trang",
+                        [
+                            "Mở <code>http://127.0.0.1:3000/landing-builder</code> trong Chrome (KHÔNG ẩn danh, để extension vẫn chạy).",
+                            "Chuột phải → <b>Dịch sang Tiếng Việt</b> (hoặc bấm biểu tượng dịch trên thanh địa chỉ).",
+                            "Chạy <b>랜딩 페이지 만들기 → AI 랜딩</b>: điền đủ 3 bước, bấm <b>AI로 디자인하기</b>.",
+                            "Đóng wizard, chuyển qua lại các tab 템플릿 모음 / 받은 문의 / 내 페이지.",
+                            "Mở một trang trong editor (vẫn đang dịch): chọn block, đổi design style rồi 제안 취소, xóa 1 block rồi Ctrl+Z, đổi 데스크톱/모바일, mở/đóng 미리보기.",
+                            "Mở trang công khai <code>/lp/{địa chỉ}</code> của một trang đã xuất bản, bật dịch, điền và gửi form."
+                        ],
+                        "Không lần nào hiện \"Application error: a client-side exception has occurred\" hay lỗi đỏ <code>removeChild</code> / <code>insertBefore</code>. Chữ đã dịch có thể hơi lệch (chữ cũ còn sót) cho tới khi tải lại — chấp nhận được.",
+                        "File: src/lib/dom-guard.ts + src/app/layout.tsx (đoạn vá chạy trước React, áp cho cả site). Claude đã test bằng cách giả lập Google Dịch: tắt vá → sập đúng lỗi removeChild; bật vá → wizard, 3 tab dashboard và 7 thao tác editor đều không sập. Lỗi đỏ hydration <code>bis_skin_checked</code> (do extension) vẫn có thể hiện ở chế độ dev — vô hại, không liên quan.",
+                        "bật dịch trang (hoặc có extension sửa trang) rồi dùng AI wizard → trang sập \"Application error\", console: <code>NotFoundError: Failed to execute 'removeChild' on 'Node'</code>."
+                    ]
+                ]
+            },
+            {
+                title: "1. Chức năng Chọn & Điều hướng Block",
+                cases: [
+                    ["tc-1-1", "TC 1.1: Click thẻ link / button trong Preview",
+                        "Click vào một Button (Nút bấm) hoặc thẻ &lt;a&gt; (link) trong vùng Canvas ở giữa.",
+                        "KHÔNG bị chuyển trang URL. Block vẫn phải được chọn (đổi Inspector cột phải & cuộn Outline cột trái)."],
+                    ["tc-1-2", "TC 1.2: Auto-scroll Outline (Cây thư mục)",
+                        "Tạo &gt; 20 blocks để cột trái xuất hiện thanh cuộn. Bấm vào một block ở tít dưới cùng trên Canvas.",
+                        "Cột Outline bên trái phải TỰ ĐỘNG CUỘN xuống đúng vị trí mục đó và highlight sáng lên."],
+                ],
+            },
+            {
+                title: "2. Chức năng Inline Editing (Sửa text trực tiếp trên Canvas)",
+                cases: [
+                    ["tc-2-1", "TC 2.1: Vượt quá số ký tự tối đa",
+                        "Copy một đoạn văn bản siêu dài (khoảng 2000 ký tự) và Paste vào một thẻ Tiêu đề (Heading).",
+                        "Trình chỉnh sửa phải tự động cắt bớt (truncate) phần thừa, không làm vỡ giao diện."],
+                    ["tc-2-2", "TC 2.2: HTML Injection / Rác từ Word",
+                        "Copy một đoạn văn có In đậm, In nghiêng, Table từ Microsoft Word/Excel rồi Paste vào Text.",
+                        "Chỉ dán dưới dạng văn bản thuần (plaintext), tự động lọc bỏ toàn bộ thẻ HTML rác."],
+                    ["tc-2-3", "TC 2.3: Xuống dòng trái phép",
+                        "Bấm vào sửa nội dung của một Nút bấm (Button) hoặc Tiêu đề, sau đó bấm phím Enter.",
+                        "Phím Enter bị chặn, con trỏ tự động thoát ra ngoài (blur). Không được rớt thành 2 dòng làm vỡ nút."],
+                    ["tc-2-4", "TC 2.4: Ctrl+Z khi đang gõ",
+                        "Đang gõ dở một dòng chữ (chưa click chuột ra ngoài để lưu), lập tức bấm Ctrl + Z.",
+                        "Không bị mất hết chữ một cách vô lý (History stack phải hoạt động đúng)."],
+                ],
+            },
+            {
+                title: "3. Chức năng Cột phải (Inspector) - Layout & Items",
+                cases: [
+                    ["tc-3-1", "TC 3.1: Thêm vượt mức giới hạn Items",
+                        "Bấm nút \"+ Thêm 항목\" (Add Item) liên tục ở một block có dạng danh sách.",
+                        "Khi đạt mức tối đa (ví dụ 4 hoặc 8 item), nút thêm phải bị mờ đi (disabled) và không cho click."],
+                    ["tc-3-2", "TC 3.2: Xóa sạch 100% Items",
+                        "Bấm icon thùng rác xóa từng Item một cho đến khi không còn Item nào trong Block đó.",
+                        "Giao diện Canvas không bị crash trắng trang. Vẫn giữ khung layout rỗng hoặc tự báo lỗi."],
+                    ["tc-3-3", "TC 3.3: Đổi Layout khi thiếu Item",
+                        "Block đang có 1 item. Sang cột phải đổi Layout (Bố cục) thành kiểu \"Hiển thị 4 cột lưới\".",
+                        "Chỗ trống bị thiếu phải không làm vỡ thiết kế, hoặc sinh ra item mẫu lấp vào."],
+                    ["tc-3-4", "TC 3.4: Tải lên (Upload) sai định dạng",
+                        "Ở mục đổi ảnh (ImageField), chọn upload một file .exe hoặc file .pdf, hoặc ảnh &gt; 5MB.",
+                        "Hiển thị lỗi từ chối, không tải file lên và không làm treo cột Inspector."],
+                ],
+            },
+            {
+                title: "4. Chức năng Cột trái (Outline) & Kéo thả",
+                cases: [
+                    ["tc-4-1", "TC 4.1: Spam Drag & Drop (Kéo thả)",
+                        "Dùng chuột kéo block số 1 xuống số 10 một cách liên tục và thả ra lúc đang cuộn trang thật nhanh.",
+                        "Thứ tự của cây component Outline phải đồng bộ chính xác với UI màn giữa, không bị đơ giật."],
+                    ["tc-4-2", "TC 4.2: Xóa block cuối cùng của trang",
+                        "Xóa dần các block cho đến khi chỉ còn Hero + Footer, thử bấm xóa tiếp.",
+                        "Hero và Footer không xóa được (nút xóa disabled hoặc có thông báo). Không bị crash trắng trang."],
+                    ["tc-4-3", "TC 4.3: Giới hạn 30 Blocks",
+                        "Thêm liên tục block vào trang cho đến khi có 30 blocks.",
+                        "Nút \"+ 구역 추가\" (Add zone) dưới cùng Outline phải bị disabled, popup thư viện không cho thêm nữa."],
+                    ["tc-4-5", "TC 4.5: Thẻ 페이지 설정 và 상단 메뉴",
+                        "Nhìn 2 thẻ đầu cột Outline, bấm chọn lần lượt từng thẻ.",
+                        "Hai thẻ liền thành một khối, không có khe/viền đôi ở giữa. Thẻ đang chọn có viền xanh đầy đủ.",
+                        "Đã sửa: trước đây 2 thẻ bo góc riêng nên chỗ tiếp giáp trông như có khoảng cách."],
+                    ["tc-4-4", "TC 4.4: Đổi tên block bằng double-click",
+                        "Double-click tên một block ở Outline, gõ tên mới, bấm Enter. Thử thêm với bấm Esc.",
+                        "Tiêu đề trên Canvas đổi theo. Enter/Esc thoát ô nhập. Ctrl+Z hoàn tác cả lần đổi tên trong một bước."],
+                ],
+            },
+            {
+                title: "5. Page Setup (페이지 설정) — nhấp nháy",
+                isNew: true,
+                cases: [
+                    ["tc-5-1", "TC 5.1: Nhấp nháy khi mở Page Setup",
+                        "Đang chọn một block, bấm \"페이지 설정\" ở Outline. Lặp lại nhiều lần; thử cả lúc Canvas đang cuộn giữa trang.",
+                        "Cột phải đổi sang Page Setup ngay, Canvas không chớp/trắng, không nhảy vị trí cuộn.",
+                        "Đo khi đứng yên trên Page Setup: không thấy DOM thay đổi hay layout shift — nếu thấy nháy, ghi rõ lúc nào (khi load, khi click, khi hover)."],
+                    ["tc-5-2", "TC 5.2: Đổi Design Style (스튜디오 / 볼드 / ...)",
+                        "Trong Page Setup bấm một style khác. Quan sát Canvas, sau đó bấm \"제안 취소\" rồi thử lại và bấm \"초안에 적용\".",
+                        "Thanh xem trước (candidate) hiện ra, Canvas đổi kiểu chữ/hình mà không chớp trắng. Hủy thì quay lại đúng như cũ, áp dụng thì Ctrl+Z quay lại được.",
+                        "Đã thấy: khi xem trước style, toàn bộ Canvas bị render lại (~470 node bị thay) và thanh công cụ/khung chọn block biến mất → có thể đây là cảm giác \"nhấp nháy\"."],
+                    ["tc-5-3", "TC 5.3: Đổi màu (Palette & Brand color)",
+                        "Bấm lần lượt các palette. Sau đó mở ô \"브랜드 색\" và kéo chọn màu liên tục.",
+                        "Canvas đổi màu mượt, không giật. Ctrl+Z hoàn tác cả lần kéo màu trong một/ít bước, không phải hàng chục bước."],
+                    ["tc-5-4", "TC 5.4: Đổi font tiêu đề / nội dung",
+                        "Chọn từng font trong 2 ô 제목 글꼴 / 본문 글꼴.",
+                        "Câu mẫu bên dưới và Canvas đổi font. Không chớp chữ vô hình (FOIT) quá lâu khi font tải lần đầu."],
+                    ["tc-5-5", "TC 5.5: Hiệu ứng xuất hiện (등장 효과)",
+                        "Chọn từng hiệu ứng (fade / rise / zoom), rồi mở \"미리보기\".",
+                        "Trong editor các block vẫn hiển thị đầy đủ, không biến mất/nháy. Trong 미리보기 hiệu ứng chạy khi cuộn."],
+                    ["tc-5-6", "TC 5.6: Nút liên hệ nhanh (빠른 연락 버튼)",
+                        "Thêm KakaoTalk, Zalo, điện thoại... tới tối đa 6 nút, bật \"직접 만든 버튼\" và nút lên đầu trang.",
+                        "Chip thêm nút ẩn khi đủ 6. Nút nổi hiện ở góc phải dưới Canvas, không tạo khoảng trống dưới Footer."],
+                    ["tc-5-7", "TC 5.7: SEO",
+                        "Nhập tiêu đề / mô tả SEO, bật \"검색 엔진에 노출하지 않기\", tải ảnh chia sẻ.",
+                        "Checklist SEO và badge \"N개 확인\" cập nhật ngay; khung xem trước kết quả tìm kiếm đổi theo."],
+                    ["tc-5-8", "TC 5.8: Accordion các nhóm",
+                        "Mở/đóng lần lượt các nhóm trong Page Setup.",
+                        "Mỗi lần chỉ một nhóm mở, cột phải không nhảy giật, cuộn riêng trong Inspector."],
+                ],
+            },
+            {
+                title: "6. Canvas — khoảng trống dưới Footer",
+                isNew: true,
+                cases: [
+                    ["tc-6-1", "TC 6.1: Thêm nhiều block rồi cuộn tới cuối",
+                        "Thêm block cho tới 20–30 block. Cuộn Canvas xuống tận cùng.",
+                        "Khung trắng kết thúc ngay dưới Footer, không có vùng trắng/xám thừa bên dưới.",
+                        "Đã đo với 30 block trên bản đang chạy ở :3000: không còn khoảng trống (chiều cao khung = chiều cao trang). Bản đó đang có sửa đổi chưa commit dùng offsetHeight thay scrollHeight."],
+                    ["tc-6-2", "TC 6.2: Thêm rồi xóa nhiều block",
+                        "Thêm 10 block, sau đó xóa 10 block đó (hoặc Ctrl+Z nhiều lần). Cuộn xuống cuối.",
+                        "Khung Canvas co lại đúng theo nội dung, không giữ chiều cao cũ."],
+                    ["tc-6-3", "TC 6.3: Chọn Footer / mở menu bố cục ở block cuối",
+                        "Chọn block Footer, rồi chọn block ngay trên Footer và mở menu layout trên thanh công cụ.",
+                        "Không làm khung Canvas cao thêm; menu không bị cắt mất."],
+                    ["tc-6-4", "TC 6.4: Chuyển Desktop ↔ Mobile",
+                        "Bấm 데스크톱 / 모바일 qua lại vài lần với trang nhiều block.",
+                        "Chiều cao khung tính lại đúng, không có khoảng trống dưới Footer ở cả hai chế độ."],
+                    ["tc-6-5", "TC 6.5: Thay đổi kích thước cửa sổ",
+                        "Kéo co giãn cửa sổ trình duyệt (rộng ↔ hẹp, qua mốc 1100px).",
+                        "Canvas tự scale lại, không bị tràn ngang, không có khoảng trống dưới Footer."],
+                    ["tc-6-6", "TC 6.6: Kéo menu nổi của website sang chỗ khác",
+                        "Ở ~1440px, cột 견적문의 / KakaoTalk / NAVER đè lên Inspector. Kéo cột đó sang vị trí khác, thả ra, rồi F5.",
+                        "Kéo được mượt, không mở link khi vừa thả chuột, không kéo ra ngoài màn hình. Sau F5 vẫn ở vị trí mới. Bấm (không kéo) thì link và nút thu gọn vẫn hoạt động.",
+                        "Đã sửa: menu kéo thả được, vị trí nhớ theo trình duyệt (localStorage \"quickMenuPos\" — xóa key này để về chỗ cũ)."],
+                ],
+            },
+            {
+                title: "7. Lưu, Xuất bản & Trạng thái",
+                isNew: true,
+                cases: [
+                    ["tc-7-1", "TC 7.1: Lưu nháp (초안 저장 / Ctrl+S)",
+                        "Sửa một chữ, bấm Ctrl+S. Không sửa gì rồi bấm Ctrl+S lần nữa.",
+                        "Lần 1 lưu và báo \"초안을 저장했습니다\". Khi không có thay đổi nút 초안 저장 bị disabled."],
+                    ["tc-7-2", "TC 7.2: Rời trang khi chưa lưu",
+                        "Sửa nội dung rồi bấm nút ← (목록으로), F5, hoặc đóng tab.",
+                        "Có hỏi xác nhận trước khi mất thay đổi."],
+                    ["tc-7-3", "TC 7.3: Sửa đồng thời ở 2 tab",
+                        "Mở cùng trang ở 2 tab, lưu ở tab A, rồi sửa và lưu ở tab B.",
+                        "Tab B báo lỗi xung đột rõ ràng, không ghi đè im lặng lên bản của tab A."],
+                    ["tc-7-4", "TC 7.4: Xuất bản khi còn nội dung mẫu",
+                        "Để nguyên chữ mẫu / ảnh không có alt, bấm 게시하기.",
+                        "Bị từ chối với thông báo nói rõ cần sửa gì."],
+                    ["tc-7-5", "TC 7.5: Xuất bản / Ngừng / Lưu trữ",
+                        "Xuất bản trang hợp lệ, mở 공개 페이지; sau đó 게시 중단, rồi 보관.",
+                        "Mỗi bước đổi trạng thái đúng, có xác nhận trước khi ngừng/lưu trữ; trang công khai ngừng truy cập được sau khi ngừng."],
+                    ["tc-7-6", "TC 7.6: Thông báo (toast)",
+                        "Làm một thao tác sinh thông báo (lưu, xóa block).",
+                        "Thông báo hiện rõ, có nút đóng và tự ẩn sau vài giây."],
+                    ["tc-7-7", "TC 7.7: Xem trước toàn màn hình (미리보기)",
+                        "Bấm 미리보기, đổi Desktop/Mobile trong cửa sổ xem trước, đóng lại.",
+                        "Hiển thị đúng như trang công khai, đóng xong quay về đúng chỗ đang sửa."],
+                    ["tc-7-8", "TC 7.8: 저장본 다시 불러오기",
+                        "Sửa vài chỗ chưa lưu, vào Page Setup → 공개 상태 → 저장본 다시 불러오기.",
+                        "Hỏi xác nhận; đồng ý thì quay về bản đã lưu, lịch sử undo được xóa."],
+                ],
+            },
+            {
+                title: "8. Template — tạo trang & sửa theo template",
+                isNew: true,
+                cases: [
+                    ["tc-8-1", "TC 8.1: Danh sách & lọc theo ngành",
+                        "Dashboard → 템플릿 모음. Bấm lần lượt từng chip ngành (기업 · IT, 전문 서비스, …) rồi 전체.",
+                        "Tổng đủ 14 template, mỗi ngành có ít nhất 1. Ảnh thu nhỏ hiện đầy đủ, không bị cao 0px hay trắng.",
+                        "Đã test tự động: 7 ngành cộng lại = 14. Ảnh thu nhỏ chưa nhìn được bằng mắt — cần kiểm tra tay."],
+                    ["tc-8-2", "TC 8.2: Xem trước template",
+                        "Bấm ảnh thu nhỏ hoặc nút 미리보기 của vài template, đổi PC/모바일, bấm 닫기 hoặc Esc.",
+                        "Hiện đúng tên template, nội dung đầy đủ, đóng được, không lỗi. Bấm nút trong form xem trước không tạo ra 문의 thật."],
+                    ["tc-8-3", "TC 8.3: Tạo trang từ template",
+                        "Bấm 이 템플릿 사용 ở một template, nhập tên + địa chỉ, bấm 초안 만들기.",
+                        "Vào editor; style, màu, danh sách block, layout và chữ mẫu khớp đúng template đã chọn (so với bản 미리보기)."],
+                    ["tc-8-4", "TC 8.4: Địa chỉ (slug) bị trùng",
+                        "Tạo trang mới với địa chỉ đã có (ví dụ test-tpl-cafe-1009).",
+                        "Hiện lỗi rõ ràng: \"이미 사용 중인 페이지 주소입니다…\", vẫn ở lại form để sửa.",
+                        "Đã sửa: trước đây thông báo là \"페이지 주소 또는 신청 번호가 이미 존재합니다\" (nhắc cả 신청 번호, gây khó hiểu)."],
+                    ["tc-8-5", "TC 8.5: Hủy form sau khi bị lỗi",
+                        "Gây lỗi ở form tạo trang (trùng địa chỉ), sau đó bấm 취소.",
+                        "Dòng báo lỗi biến mất theo form, KHÔNG còn hiện trên trang danh sách.",
+                        "Đã sửa: trước đây lỗi vẫn kẹt lại trên dashboard sau khi hủy."],
+                    ["tc-8-6", "TC 8.6: Gõ địa chỉ có dấu cách / gạch dưới / tiếng Việt",
+                        "Gõ vào ô 페이지 주소: \"TEST_tpl cafe 1009\", \"Tour 2026 Đà Nẵng\", \"a--b\", \"travel-\" rồi click ra ngoài. Làm lại ở ô địa chỉ của AI wizard.",
+                        "Thành \"test-tpl-cafe-1009\", \"tour-2026-da-nang\", \"a-b\"; gạch cuối bị bỏ khi rời ô (\"travel\").",
+                        "Đã sửa: trước đây dấu cách và _ bị xóa âm thầm (\"testtplcafe1009\"), chữ có dấu bị mất (\"nng\")."],
+                    ["tc-8-7", "TC 8.7: Đổi design style trong editor",
+                        "Page Setup → 디자인 스타일 → chọn style khác. Thử 제안 취소, rồi chọn lại và 초안에 적용.",
+                        "Thanh xem trước hiện, 게시하기 bị khóa trong lúc xem. Hủy thì về như cũ; áp dụng thì chỉ đổi kiểu chữ/hình — nội dung, block và màu giữ nguyên."],
+                    ["tc-8-8", "TC 8.8: Undo/Redo, lưu và tải lại sau khi đổi style",
+                        "Sau khi áp dụng style: Ctrl+Z, Ctrl+Shift+Z, rồi 초안 저장 và F5.",
+                        "Undo về style cũ, redo về style mới. Sau F5 vẫn là style đã lưu."],
+                    ["tc-8-9", "TC 8.9: Tạo bằng AI với template đã chọn",
+                        "Chọn 일반/AI → AI 랜딩, ở 템플릿 모음 bấm 이 템플릿 사용, điền brief và tạo.",
+                        "Wizard mở với đúng template; trang tạo ra dùng style/màu đã chọn. Nếu AI chưa cấu hình thì có thông báo rõ ràng.",
+                        "Đã sửa lỗi: trước đây chọn style 볼드/소프트/클래식/테크 trong wizard thì báo \"올바른 템플릿을 선택해 주세요.\" và không tạo được trang; chọn template ngành (vd 카페) thì bị tạo thành template 에디토리얼. Đã test API: 카페 + 소프트 tạo đúng (style soft-v1, giữ bộ block của 카페). Bước gọi AI thật chưa test."],
+                    ["tc-8-10", "TC 8.10: Wizard AI — mỗi style",
+                        "AI 랜딩 → wizard → bước 구성 · 디자인: lần lượt chọn từng style (스튜디오 … 테크) và \"AI가 선택\", tạo trang.",
+                        "Không style nào bị lỗi khi tạo. Trang tạo ra dùng đúng style đã chọn (Page Setup → 디자인 스타일 hiện đúng); chọn \"AI가 선택\" thì AI tự chọn một trong 6 style."],
+                ],
+            },
+            {
+                title: "9. Sửa chữ trực tiếp — các chỗ trước đây không sửa được",
+                isNew: true,
+                cases: [
+                    ["tc-9-1", "TC 9.1: Tên thương hiệu",
+                        "Bấm vào tên thương hiệu trên thanh menu (khi chưa có logo) và ở footer, gõ tên mới.",
+                        "Gõ được ở cả 2 chỗ; sửa 1 chỗ thì chỗ kia và dòng © đổi theo. Ctrl+Z hoàn tác được. Có logo thì thanh menu hiện logo (không sửa chữ ở đó).",
+                        "Đã sửa + test trên trang id 7: sửa ở thanh menu → footer đổi theo, lưu đúng."],
+                    ["tc-9-2", "TC 9.2: Số điện thoại / email / địa chỉ ở footer",
+                        "Chọn block 하단 정보, bấm vào từng dòng liên hệ (dòng trống hiện ô nhập khi block đang chọn), gõ nội dung.",
+                        "Gõ được; bấm vào không mở trình gọi điện / mail. Số điện thoại sai định dạng thì khi lưu báo \"전화번호를 확인해 주세요.\". Ở 미리보기 vẫn là link bấm gọi / gửi mail.",
+                        "Đã sửa + test: sửa SĐT, lưu, 미리보기 có link tel: đúng."],
+                    ["tc-9-3", "TC 9.3: Chữ trên nút gửi của form",
+                        "Chọn block 문의 양식, bấm vào chữ trên nút (\"신청하기\"…), gõ chữ mới. Thử trên Chrome và Firefox.",
+                        "Gõ được trên cả 2 trình duyệt, Enter không xuống dòng và không gửi form. Ở 미리보기 vẫn là nút gửi thật với chữ mới.",
+                        "Đã sửa + test trên Chrome (chưa test Firefox)."],
+                    ["tc-9-4", "TC 9.4: Danh sách tính năng trong bảng giá",
+                        "Thêm block 요금 (kiểu 카드 và kiểu 목록). Bấm vào danh sách tính năng của một gói, sửa / thêm dòng (Enter = tính năng mới).",
+                        "Mỗi dòng là một tính năng. Ở 미리보기: kiểu 카드 hiện danh sách có dấu ✓, kiểu 목록 hiện nối bằng \" · \".",
+                        "Đã sửa + test kiểu 카드: 3 dòng → 미리보기 ra đúng 3 mục."],
+                ],
+            },
+            {
+                title: "10. Case lớn — mất khách, mất dữ liệu, bảo mật",
+                isNew: true,
+                cases: [
+                    ["tc-10-1", "TC 10.1: Xuất bản lại khi khách đang điền form",
+                        "Mở trang công khai ở tab ẩn danh, điền form nhưng CHƯA gửi. Ở editor sửa 1 chữ bất kỳ (vd tiêu đề) rồi 게시하기. Quay lại tab khách bấm gửi.",
+                        "Khách vẫn gửi được (form không đổi thì không có lý do từ chối), hoặc ít nhất không mất dữ liệu đã điền.",
+                        "ĐÃ SỬA (fix/edit-template). Trước đây: khách nhận 409 \"다시 불러온 뒤 신청해 주세요\" mỗi khi chủ trang 게시하기 → mất lead. Giờ server nhận nếu form khách đang thấy vẫn còn; câu trả lời kiểm tra theo form hiện tại. Đã test API: đổi tiêu đề + xuất bản lại → khách bản cũ gửi được (200). Cần test tay trên giao diện."],
+                    ["tc-10-2", "TC 10.2: Spam làm nghẽn form của khách thật",
+                        "Gửi ~100 request rác (sai dữ liệu) tới /api/landing-pages/{slug}/leads trong 1 phút, rồi gửi 1 lượt 문의 hợp lệ.",
+                        "Khách thật vẫn gửi được; chỉ người spam bị chặn.",
+                        "ĐÃ SỬA (fix/edit-template). Trước đây: 100 request rác → khách thật bị 429. Giờ: giới hạn 20 lượt/phút theo IP (tính trước khi đọc dữ liệu) + giới hạn 100/phút của trang chỉ đếm lượt gửi hợp lệ. Đã test: 1 IP spam 100 rác → chính IP đó bị 429 sau 20 lượt, khách IP khác vẫn gửi được (200). Giới hạn vẫn nằm trong RAM (khởi động lại server là reset)."],
+                    ["tc-10-3", "TC 10.3: ⚠️ 보관 là thao tác một chiều",
+                        "Bấm 보관 một trang đã xuất bản rồi thử: sửa, 게시하기, 게시 중단, tạo trang mới với cùng địa chỉ.",
+                        "Hộp xác nhận nói rõ là không hoàn tác được, hoặc có cách khôi phục.",
+                        "Đã test: sau 보관 không sửa/xuất bản/khôi phục được (409 với thông báo khó hiểu \"다시 불러와 주세요\"), địa chỉ trang bị khóa vĩnh viễn (409 khi tạo lại). Hộp xác nhận chỉ nói \"받은 문의는 유지됩니다\". 문의 vẫn được giữ (ĐẠT)."],
+                    ["tc-10-4", "TC 10.4: ⚠️ CSS của khối HTML tự do tải tài nguyên ngoài",
+                        "Trang có khối HTML tự do (AI 자유 디자인) với CSS chứa url(\"https://site-ngoai/...\"). Xuất bản, mở trang công khai, xem tab Network.",
+                        "Không tải ảnh/tài nguyên từ domain ngoài (tài liệu ghi \"non-uploaded images removed\").",
+                        "LỖI nhẹ (đã tái hiện): url() ngoài trong CSS được giữ nguyên trong trang công khai, trang không có Content-Security-Policy → có thể gắn tracking pixel / lộ IP khách. Script, onerror, javascript:, iframe, form, @import đều bị lọc (ĐẠT)."],
+                    ["tc-10-5", "TC 10.5: ⚠️ Sửa cùng trang ở 2 tab / 2 máy",
+                        "Mở cùng 1 trang ở 2 tab. Tab A sửa + lưu. Tab B sửa chỗ khác + lưu.",
+                        "Không ghi đè mất bản của A; B được báo rõ và không mất phần mình vừa sửa.",
+                        "Đã test API: B bị 409, bản của A được giữ (ĐẠT, không mất dữ liệu A). Nhưng B chỉ có lựa chọn \"저장본 다시 불러오기\" → mất toàn bộ phần B đã sửa. Cần test tay giao diện tab B."],
+                    ["tc-10-6", "TC 10.6: ✅ Luồng xuất bản → nhận 문의 → CSV",
+                        "Tạo trang, thay hết chữ mẫu, điền SĐT footer + link chính sách, 게시하기. Gửi 문의 từ trang công khai. Xem tab 받은 문의 và tải CSV.",
+                        "Trang công khai hiện đúng; 문의 vào đúng danh sách; gửi lại (mạng chập chờn) không tạo bản trùng; CSV mở bằng Excel không chạy công thức.",
+                        "ĐẠT (Claude test qua API): trang 200 + JSON-LD, gửi lại cùng mã không trùng, cùng mã khác dữ liệu → 409, thiếu đồng ý/SĐT sai → 400, bẫy bot trả 200 mà không lưu, CSV thêm ' trước công thức =HYPERLINK. Chưa test bấm trên giao diện trang công khai."],
+                    ["tc-10-7", "TC 10.7: ✅ Bản nháp không lộ ra trang công khai",
+                        "Trang đã xuất bản: sửa tiêu đề trong editor + lưu nháp (chưa 게시하기). Mở trang công khai. Sau đó 게시하기 và mở lại.",
+                        "Trước khi 게시하기: trang công khai vẫn là bản cũ. Sau: bản mới. Trang nháp/chưa xuất bản trả 404.",
+                        "ĐẠT (đã test)."],
+                    ["tc-10-8", "TC 10.8: ✅ XSS qua chữ, tên thương hiệu, SEO, link",
+                        "Nhập <code>&lt;img src=x onerror=alert(1)&gt;&lt;script&gt;alert(2)&lt;/script&gt;</code> vào tiêu đề, tên thương hiệu, tiêu đề SEO; nhập javascript:alert(1) vào link nút. Xuất bản, mở trang công khai.",
+                        "Không có hộp alert nào; chữ hiện nguyên văn; link javascript: bị từ chối khi lưu.",
+                        "ĐẠT (đã test): HTML bị escape cả trong <code>&lt;title&gt;</code> và JSON-LD; link javascript: → 400."],
+                    ["tc-10-9", "TC 10.9: ✅ Upload file độc",
+                        "Upload: file .html đổi tên .png, file SVG có script, ảnh > 5MB.",
+                        "Đều bị từ chối với thông báo rõ ràng.",
+                        "ĐẠT (đã test): server kiểm tra chữ ký file thật. Lưu ý nhỏ: PNG có đuôi chèn <code>&lt;script&gt;</code> vẫn nhận nhưng phục vụ dạng image/png (an toàn); dev server không gửi X-Content-Type-Options: nosniff — kiểm tra lại header trên nginx production."],
+                    ["tc-10-10", "TC 10.10: ✅ Gọi API trực tiếp để lách giới hạn",
+                        "Gửi PATCH với: tiêu đề 5000 ký tự, 31 block, 2 hero, không footer, loại block lạ, trùng id block, 60 item, body 3MB.",
+                        "Server từ chối hết, không lưu dữ liệu hỏng.",
+                        "ĐẠT (đã test): tất cả bị chặn với thông báo đúng (400 / 413)."],
+                    ["tc-10-11", "TC 10.11: ✅ Gửi form từ trang web khác (CSRF) & truy cập trang người khác",
+                        "Gửi POST tới API 문의 / API quản trị từ domain khác hoặc không có Origin; dùng tài khoản B mở /landing-builder/{id của A}.",
+                        "403 cho request khác nguồn; tài khoản B không xem/sửa/xuất bản/xem 문의 của A.",
+                        "ĐẠT phần CSRF (403) và chưa đăng nhập (401). Phần tài khoản B: Claude chỉ kiểm tra code (mọi API đều lọc author_id), CHƯA test thật — cần 2 tài khoản."],
+                    ["tc-10-12", "TC 10.12: Xuất bản lại có THÊM câu hỏi bắt buộc khi khách đang điền",
+                        "Khách mở trang và điền form. Chủ trang thêm 1 câu hỏi bắt buộc vào form rồi 게시하기. Khách bấm gửi (chưa tải lại).",
+                        "Khách thấy thông báo rõ câu hỏi còn thiếu, dữ liệu đã điền vẫn còn; tải lại trang thì thấy câu hỏi mới, điền xong gửi được.",
+                        "Đã test API: nhận 400 \"「희망 일정」 항목을 입력해 주세요.\"; gửi kèm câu trả lời → 200. Lưu ý: form bản cũ của khách KHÔNG hiện câu hỏi mới cho đến khi tải lại → cần test tay xem trải nghiệm có chấp nhận được không."],
+                    ["tc-10-13", "TC 10.13: Xuất bản lại khi đã XÓA / THAY form",
+                        "Khách mở trang. Chủ trang xóa block 문의 양식 cũ và thêm block mới (hoặc đổi sang form khác) rồi 게시하기. Khách bấm gửi.",
+                        "Bị từ chối với thông báo tải lại trang (không lưu vào form không còn tồn tại).",
+                        "Đã test API: 409 \"페이지가 수정되었습니다…\" (ĐẠT — giữ đúng hành vi cũ cho trường hợp này)."],
+                    ["tc-10-14", "TC 10.14: Nhiều khách chung 1 mạng (văn phòng / Wi-Fi quán cà phê)",
+                        "Từ CÙNG 1 mạng (cùng IP công cộng), cho 3–5 người/thiết bị gửi 문의 trong cùng 1 phút, mỗi người gửi 1–2 lần.",
+                        "Tất cả đều gửi được. Chỉ bị chặn khi 1 IP gửi > 20 lượt/phút.",
+                        "Đã test: 1 người gửi 3 lần liên tiếp → 200 cả 3. Chưa test nhiều thiết bị thật."],
+                    ["tc-10-15", "TC 10.15: Production có lấy đúng IP khách không (nginx)",
+                        "Trên server thật: kiểm tra cấu hình nginx có proxy_set_header X-Real-IP $remote_addr (hoặc X-Forwarded-For). Gửi 25 request rác từ 1 máy, rồi gửi 문의 thật từ điện thoại 4G.",
+                        "Máy spam bị 429 sau 20 lượt; điện thoại 4G vẫn gửi được.",
+                        "Chưa test (cần server thật). Nếu nginx không gửi IP thật, server chỉ thấy 127.0.0.1 → code đã được viết để BỎ QUA giới hạn theo IP trong trường hợp này (không chặn cả site), nhưng khi đó cũng mất khả năng chặn spam theo IP → nên thêm proxy_set_header X-Real-IP $remote_addr vào nginx."],
+                ],
+            },
+        ];
 
-["#q", "#fGroup", "#fPrio", "#fStatus"].forEach((s) => $(s).addEventListener("input", render));
+        const KEY = "lb-test:";
+        const load = (id) => {
+            try { return JSON.parse(localStorage.getItem(KEY + id)) || {}; } catch { return {}; }
+        };
+        const save = (id, data) => {
+            try { localStorage.setItem(KEY + id, JSON.stringify(data)); } catch {}
+        };
+        // dữ liệu cũ: localStorage[id] = "true" (chỉ có tick)
+        const migrate = (id) => {
+            try {
+                if (localStorage.getItem(id) === "true" && !localStorage.getItem(KEY + id)) save(id, { status: "pass" });
+                localStorage.removeItem(id);
+            } catch {}
+        };
 
-$("#runDate").addEventListener("change", (ev) => {
-  runDate = ev.target.value || todayStr();
-  loadRun();
-  render();
-});
+        const root = document.getElementById("sections");
+        for (const section of sections) {
+            const h2 = document.createElement("h2");
+            h2.innerHTML = section.title + (section.isNew ? '<span class="new">mới</span>' : "");
+            root.appendChild(h2);
+            for (const [id, title, steps, expected, hint, before] of section.cases) {
+                migrate(id);
+                const el = document.createElement("div");
+                el.className = "test-case";
+                el.dataset.id = id;
+                el.innerHTML = `
+                    <div class="actions">
+                        <button type="button" class="mark pass" title="Đạt" aria-label="Đánh dấu đạt">✓</button>
+                        <button type="button" class="mark fail" title="Lỗi (failed)" aria-label="Đánh dấu lỗi">✕</button>
+                        <button type="button" class="mark skip" title="Bỏ qua — chưa cần test" aria-label="Bỏ qua mục này">⏭</button>
+                    </div>
+                    <div class="content">
+                        <strong>${title}</strong>
+                        ${before ? `<small class="before">🐞 Trước khi sửa: ${before}</small>` : ""}
+                        ${Array.isArray(steps)
+                            ? `<div class="steps-label">Các bước:</div><ol class="steps">${steps.map((x) => `<li>${x}</li>`).join("")}</ol>`
+                            : `<span>Thao tác: ${steps}</span>`}
+                        <em>Mong đợi: ${expected}</em>
+                        ${hint ? `<small class="hint">📝 ${hint}</small>` : ""}
+                        <textarea class="note" rows="1" placeholder="Ghi chú lỗi khi test..."></textarea>
+                    </div>`;
+                const data = load(id);
+                const note = el.querySelector(".note");
+                note.value = data.note || "";
+                apply(el, data.status);
+                el.querySelector(".mark.pass").addEventListener("click", () => toggle(el, "pass"));
+                el.querySelector(".mark.fail").addEventListener("click", () => toggle(el, "fail"));
+                el.querySelector(".mark.skip").addEventListener("click", () => toggle(el, "skip"));
+                note.addEventListener("input", () => {
+                    save(id, { ...load(id), note: note.value });
+                    refresh();
+                });
+                root.appendChild(el);
+            }
+        }
 
-$("#resetBtn").addEventListener("click", () => {
-  if (!confirm(`Xoá toàn bộ kết quả + ghi chú của ngày ${runDate}?`)) return;
-  run = {};
-  saveRun();
-  render();
-});
+        function apply(el, status) {
+            el.classList.toggle("passed", status === "pass");
+            el.classList.toggle("failed", status === "fail");
+            el.classList.toggle("skipped", status === "skip");
+        }
+        function toggle(el, status) {
+            const data = load(el.dataset.id);
+            data.status = data.status === status ? undefined : status;
+            save(el.dataset.id, data);
+            apply(el, data.status);
+            refresh();
+            if (data.status === "fail") el.querySelector(".note").focus();
+        }
 
-$("#addBtn").addEventListener("click", () => {
-  $("#addForm").reset();
-  const fg = $("#fGroup").value;
-  const g = allGroups().find((x) => x.id === fg);
-  if (g) $("#aGroup").value = g.name;
-  $("#addDlg").showModal();
-});
-$("#addDlg").addEventListener("close", () => {
-  if ($("#addDlg").returnValue !== "ok") return;
-  const g = $("#aGroup").value.trim(), t = $("#aTitle").value.trim(), e = $("#aExpect").value.trim();
-  if (!g || !t || !e) return;
-  custom.push({
-    id: "cu-" + Date.now().toString(36),
-    g, t, e,
-    p: $("#aPrio").value,
-    tags: $("#aTags").value.split(",").map((x) => x.trim()).filter(Boolean),
-  });
-  store.set(KEY_CUSTOM, custom);
-  render();
-  toast("Đã thêm test case");
-});
+        const filter = document.getElementById("filter");
+        filter.addEventListener("change", refresh);
+        function refresh() {
+            const cases = [...document.querySelectorAll(".test-case")];
+            let pass = 0, fail = 0, skip = 0;
+            for (const el of cases) {
+                const data = load(el.dataset.id);
+                if (data.status === "pass") pass++;
+                if (data.status === "fail") fail++;
+                if (data.status === "skip") skip++;
+                const show =
+                    filter.value === "all" ||
+                    (filter.value === "todo" && !data.status) ||
+                    (filter.value === "failed" && data.status === "fail") ||
+                    (filter.value === "skipped" && data.status === "skip") ||
+                    (filter.value === "active" && data.status !== "skip") ||
+                    (filter.value === "noted" && (data.note || "").trim());
+                el.style.display = show ? "" : "none";
+            }
+            document.getElementById("count-pass").textContent = `${pass} đạt`;
+            document.getElementById("count-fail").textContent = `${fail} lỗi`;
+            document.getElementById("count-todo").textContent = `${cases.length - pass - fail - skip} chưa test`;
+            document.getElementById("count-skip").textContent = `${skip} bỏ qua`;
+        }
+        refresh();
 
-$("#mdBtn").addEventListener("click", async () => {
-  const lines = [`## Kết quả test ${runDate}`, ""];
-  const mark = { pass: "✅", fail: "❌", skip: "⏭️" };
-  for (const g of allGroups()) {
-    const rows = g.cases.filter((c) => run[c.id]?.s || run[c.id]?.n);
-    if (!rows.length) continue;
-    lines.push(`### ${g.name}`);
-    for (const c of rows) {
-      const r = run[c.id];
-      lines.push(`- ${mark[r.s] || "⬜"} **${c.id}** ${c.t}`);
-      if (r.n) lines.push(`  - Ghi chú: ${r.n.replace(/\n/g, " / ")}`);
-    }
-    lines.push("");
-  }
-  const failed = allGroups().flatMap((g) => g.cases).filter((c) => run[c.id]?.s === "fail");
-  if (failed.length) lines.splice(2, 0, `**Lỗi: ${failed.length}** — ${failed.map((c) => c.id).join(", ")}`, "");
-  const text = lines.join("\n");
-  try { await navigator.clipboard.writeText(text); toast("Đã copy Markdown"); }
-  catch (e) {
-    const w = window.open("", "_blank");
-    if (w) { w.document.body.innerText = text; } else { prompt("Copy thủ công:", text); }
-  }
-});
+        function copyFailed() {
+            const lines = [...document.querySelectorAll(".test-case")]
+                .map((el) => ({ el, data: load(el.dataset.id) }))
+                .filter(({ data }) => data.status === "fail")
+                .map(({ el, data }) => `- ${el.querySelector("strong").textContent}${data.note ? `\n  ${data.note.replace(/\n/g, "\n  ")}` : ""}`);
+            const text = lines.length ? lines.join("\n") : "Chưa có mục nào bị đánh dấu lỗi.";
+            navigator.clipboard?.writeText(text).then(
+                () => alert(`Đã copy ${lines.length} mục lỗi.`),
+                () => prompt("Copy nội dung bên dưới:", text),
+            );
+        }
 
-$("#historyBtn").addEventListener("click", () => {
-  const days = store.keys().filter((k) => k.startsWith("bwihb:run:")).map((k) => k.slice(10)).sort().reverse();
-  const items = days.map((d) => {
-    const r = store.get(KEY_RUN(d), {});
-    const v = Object.values(r);
-    const c = (s) => v.filter((x) => x.s === s).length;
-    return `<li><a data-day="${esc(d)}">${esc(d)}</a> — ✅ ${c("pass")} · ❌ ${c("fail")} · ⏭️ ${c("skip")}</li>`;
-  });
-  $("#historyList").innerHTML = items.join("") || "<li>Chưa có ngày nào.</li>";
-  $("#historyDlg").showModal();
-});
-$("#historyList").addEventListener("click", (ev) => {
-  const d = ev.target.dataset.day;
-  if (!d) return;
-  runDate = d;
-  $("#runDate").value = d;
-  loadRun();
-  render();
-  $("#historyDlg").close();
-});
-
-function buildExport() {
-  const data = { version: 1, exportedAt: new Date().toISOString(), custom, runs: {} };
-  for (const k of store.keys()) if (k.startsWith("bwihb:run:")) data.runs[k.slice(10)] = store.get(k, {});
-  return JSON.stringify(data, null, 2);
-}
-
-// Ghi results.json thẳng vào thư mục repo (Chrome/Edge: File System Access API).
-// Lần đầu chọn đúng thư mục repo + tên results.json; các lần sau trình duyệt nhớ thư mục.
-// Trình duyệt không hỗ trợ → tải file về, tự chép vào thư mục repo.
-$("#saveFolderBtn").addEventListener("click", async () => {
-  const text = buildExport();
-  if (window.showSaveFilePicker) {
-    try {
-      const handle = await window.showSaveFilePicker({
-        id: "bwihb-results",
-        suggestedName: "results.json",
-        types: [{ description: "JSON", accept: { "application/json": [".json"] } }],
-      });
-      const w = await handle.createWritable();
-      await w.write(text);
-      await w.close();
-      toast("Đã lưu results.json");
-      return;
-    } catch (e) {
-      if (e && e.name === "AbortError") return;
-    }
-  }
-  const blob = new Blob([text], { type: "application/json" });
-  const a = document.createElement("a");
-  a.href = URL.createObjectURL(blob);
-  a.download = "results.json";
-  a.click();
-  URL.revokeObjectURL(a.href);
-  toast("Đã tải results.json — chép vào thư mục repo");
-});
-
-$("#exportBtn").addEventListener("click", () => {
-  const blob = new Blob([buildExport()], { type: "application/json" });
-  const a = document.createElement("a");
-  a.href = URL.createObjectURL(blob);
-  a.download = `breaking-tests-${todayStr()}.json`;
-  a.click();
-  URL.revokeObjectURL(a.href);
-});
-$("#importBtn").addEventListener("click", () => $("#importFile").click());
-$("#importFile").addEventListener("change", async (ev) => {
-  const f = ev.target.files[0];
-  if (!f) return;
-  try {
-    const data = JSON.parse(await f.text());
-    if (!data || typeof data !== "object") throw new Error();
-    if (!confirm("Khôi phục sẽ GỘP test case tự thêm và GHI ĐÈ kết quả các ngày có trong file. Tiếp tục?")) return;
-    const ids = new Set(custom.map((c) => c.id));
-    for (const c of data.custom || []) if (!ids.has(c.id)) custom.push(c);
-    store.set(KEY_CUSTOM, custom);
-    for (const [d, r] of Object.entries(data.runs || {})) store.set(KEY_RUN(d), r);
-    loadRun();
-    render();
-    toast("Đã khôi phục");
-  } catch (e) {
-    toast("File JSON không hợp lệ");
-  } finally {
-    ev.target.value = "";
-  }
-});
-
-/* theme */
-function applyTheme(t) {
-  if (t) document.documentElement.setAttribute("data-theme", t);
-  else document.documentElement.removeAttribute("data-theme");
-}
-$("#themeBtn").addEventListener("click", () => {
-  const cur = document.documentElement.getAttribute("data-theme");
-  const sysDark = window.matchMedia && matchMedia("(prefers-color-scheme: dark)").matches;
-  const isDark = cur ? cur === "dark" : sysDark;
-  const next = isDark ? "light" : "dark";
-  applyTheme(next);
-  store.set(KEY_THEME, next);
-});
-
-let toastTimer;
-function toast(msg) {
-  const el = $("#toast");
-  el.textContent = msg;
-  el.classList.add("show");
-  clearTimeout(toastTimer);
-  toastTimer = setTimeout(() => el.classList.remove("show"), 1800);
-}
-
-/* init */
-applyTheme(store.get(KEY_THEME, null));
-$("#runDate").value = runDate;
-const savedFilter = store.get(KEY_FILTER, {});
-render(); // build group options first
-if (savedFilter.fg) $("#fGroup").value = savedFilter.fg;
-if (savedFilter.fp) $("#fPrio").value = savedFilter.fp;
-if (savedFilter.fs) $("#fStatus").value = savedFilter.fs;
-loadRun();
-render();
-</script>
+        function resetAll() {
+            if (confirm("Bạn có chắc chắn muốn xóa toàn bộ đánh dấu và ghi chú không?")) {
+                document.querySelectorAll(".test-case").forEach((el) => {
+                    try { localStorage.removeItem(KEY + el.dataset.id); } catch {}
+                    apply(el, undefined);
+                    el.querySelector(".note").value = "";
+                });
+                refresh();
+            }
+        }
+    </script>
 </body>
 </html>
