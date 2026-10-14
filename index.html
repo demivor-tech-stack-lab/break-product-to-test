@@ -1104,11 +1104,168 @@
                         "App chưa tự hiển thị số token — có thể thêm log nếu cần."],
                 ],
             },
+            {
+                title: "15. Template mới — 8 phong cách (brutalist → community)",
+                isNew: true,
+                cases: [
+                    ["tpl-1", "TC 15.1: ⭐ Thư viện template hiện đủ 8 mẫu mới",
+                        [
+                            "Mở <code>/landing-builder</code> → tạo trang mới → xem danh sách template.",
+                            "Tìm: 브루탈리스트 에이전시, 스타트업 다크, 매거진 에디토리얼, 미니멀 포트폴리오, 오가닉 라운드, 테크 대시보드, 럭셔리 브랜드, 커뮤니티 모임."
+                        ],
+                        "Cả 8 mẫu có ảnh thu nhỏ, tên và mô tả tiếng Hàn đọc trơn (không có chữ lỗi kiểu \"체널\", \"툴드\"). Lọc theo nhóm (기업 · IT, 전문 서비스, 음식 · 여행, 이벤트) vẫn ra đúng mẫu.",
+                        "Commit cee3dbd. Mẫu nằm cuối mảng presets trong src/lib/landing/presets.ts."],
+                    ["tpl-2", "TC 15.2: Tạo trang từ từng mẫu mới",
+                        [
+                            "Với mỗi mẫu ở TC 15.1: bấm dùng mẫu → trang mở trong editor.",
+                            "Kéo hết trang, xem từng block."
+                        ],
+                        "Không trắng trang, không lỗi console. Đúng phong cách: magazine có tiêu đề kiểu bìa tạp chí + chữ cái đầu lớn; minimal chữ mảnh nhiều khoảng trắng; organic khối tròn và hình blob; tech-dash nền tối có lưới; luxury ảnh phủ chữ giữa, viền vàng; community nút nảy và thẻ chạy ngang.",
+                        "Claude đã xem cả 8 mẫu bằng trang preview tạm (không cần đăng nhập)."],
+                    ["tpl-3", "TC 15.3: Đổi layout sang biến thể mới trong Inspector",
+                        [
+                            "Trên một trang bất kỳ, chọn block rồi đổi layout:",
+                            "첫 화면 → 매거진 / 미니멀; 주요 장점 → 흐르는 카드; 이미지 + 소개 → 큰 인용문; 글 → 풀쿼트 / 3단 칼럼; 고객 후기 → 회사명 + 후기; 행동 유도 → 그라디언트 카드 / 테두리 카드."
+                        ],
+                        "Nội dung giữ nguyên, chỉ đổi bố cục. Không mất chữ, không mất ảnh.",
+                        "Chưa test trong editor (cần đăng nhập)."],
+                    ["tpl-4", "TC 15.4: ⭐ Sửa chữ trực tiếp trong biến thể mới",
+                        [
+                            "Trong editor, bấm vào chữ của từng biến thể mới ở TC 15.3 và sửa (tiêu đề, mô tả, nút, thẻ).",
+                            "Riêng 흐르는 카드: thẻ phải đứng yên trong editor để sửa được."
+                        ],
+                        "Sửa được mọi chữ; lưu rồi tải lại vẫn còn. 흐르는 카드 trong editor là hàng thẻ đứng yên, xuống dòng; trên trang công khai mới chạy ngang và dừng khi rê chuột.",
+                        "Chưa test trong editor (cần đăng nhập).",
+                        "nếu thẻ chạy trong editor thì không bấm vào để sửa được."],
+                    ["tpl-5", "TC 15.5: Thay ảnh trong biến thể mới",
+                        [
+                            "Hero 매거진 / 미니멀 / 브루탈리스트, 이미지 + 소개 → 큰 인용문: bấm 이미지 추가 / 이미지 교체."
+                        ],
+                        "Ảnh hiện đúng chỗ. Hero 브루탈리스트 có ảnh thì chữ vẫn đọc được (có lớp tối phủ lên ảnh).",
+                        "Chưa test trong editor (cần đăng nhập)."],
+                    ["tpl-6", "TC 15.6: Hero 브루탈리스트 — nhãn nhỏ phía trên chỉ hiện 1 lần",
+                        [
+                            "Tạo trang từ 브루탈리스트 에이전시, nhìn phần đầu trang."
+                        ],
+                        "Dòng \"CREATIVE AGENCY\" trong khung viền hiện đúng 1 lần.",
+                        "Claude đã xem trên trang preview.",
+                        "nhãn hiện 2 lần (1 trong khung viền, 1 phía trên tiêu đề)."],
+                    ["tpl-7", "TC 15.7: Đổi 디자인 스타일 của trang có sẵn sang 6 kiểu mới",
+                        [
+                            "Mở một trang cũ → Inspector → 디자인 스타일 → lần lượt chọn 매거진, 미니멀, 오가닉, 테크 대시보드, 럭셔리, 커뮤니티."
+                        ],
+                        "Chữ, khoảng cách, bo góc, nút đổi theo kiểu; nội dung và màu giữ nguyên. Không block nào bị vỡ.",
+                        "Chưa test trong editor (cần đăng nhập)."],
+                    ["tpl-8", "TC 15.8: Điện thoại (390px)",
+                        [
+                            "Xem các trang tạo ở TC 15.2 ở khung điện thoại trong editor (hoặc mở trên điện thoại)."
+                        ],
+                        "Không cuộn ngang. 3단 칼럼 còn 1 cột; magazine ảnh trên, chữ dưới; 큰 인용문 ảnh xuống dưới; 흐르는 카드 vẫn chạy trong khung.",
+                        "Claude đã kiểm tra ở 375px với magazine, minimal, community: không cuộn ngang."],
+                    ["tpl-9", "TC 15.9: Tắt chuyển động (giảm chuyển động trong hệ điều hành)",
+                        [
+                            "Bật \"Reduce motion\" / \"동작 줄이기\" trong Windows hoặc điện thoại, mở trang community-social đã xuất bản."
+                        ],
+                        "흐르는 카드 đứng yên, xuống dòng, không lặp thẻ; nền 그라디언트 카드 không chuyển động.",
+                        "Chưa test."],
+                    ["tpl-10", "TC 15.10: AI chọn biến thể mới",
+                        [
+                            "Chạy AI wizard với brief kiểu tạp chí / cộng đồng, chọn phong cách mới."
+                        ],
+                        "AI có thể chọn các layout mới (danh sách layout cho AI lấy tự động từ blocks.ts). Trang tạo ra không lỗi.",
+                        "Chưa test (tốn quota Gemini)."],
+                ],
+            },
+            {
+                title: "16. AI 랜딩 — 참고할 사이트 (thiết kế theo website tham khảo)",
+                isNew: true,
+                cases: [
+                    ["ref-1", "TC 16.1: ⭐ Đọc website tham khảo trong AI wizard",
+                        [
+                            "랜딩 페이지 만들기 → AI 랜딩 → điền 브랜드 정보 → 다음.",
+                            "Ô \"참고할 사이트 (선택)\": dán <code>https://html5up.net/uploads/demos/stellar/</code> → bấm 사이트 읽기."
+                        ],
+                        "Vài giây sau hiện: tên \"Stellar by HTML5 UP\", 디자인: 미니멀, chấm màu + 대표 색 #8cc9f0, 밝은 배경, \"구성 6개 구역: 첫 화면 → 이미지 + 소개 → 주요 장점 → 숫자로 보는 성과 → 행동 유도 → 문의 양식\". Hai ô 디자인 스타일 và 색상 chuyển thành \"참고 사이트에 맞춤\".",
+                        "Claude đã test qua harness tạm, commit f5bb40f."],
+                    ["ref-2", "TC 16.2: ⭐ AI 맞춤 디자인 theo tham khảo",
+                        [
+                            "Sau TC 16.1, chọn AI 맞춤 디자인 → 다음 → điền tên + địa chỉ → AI로 디자인하기 (tốn 1 lượt Gemini).",
+                        ],
+                        "Trang ra màu xanh nhạt chủ đạo, chữ mảnh, thứ tự gần giống Stellar (hero → giới thiệu có ảnh → thẻ → số liệu → kêu gọi). Không có chữ tiếng Anh/lorem, logo hay ảnh của Stellar; nội dung là của brand.",
+                        "Chưa test (tốn quota)."],
+                    ["ref-3", "TC 16.3: 템플릿 기반 디자인 theo tham khảo",
+                        [
+                            "Làm lại TC 16.2 nhưng chọn 템플릿 기반 디자인.",
+                        ],
+                        "Trang có đúng các khối theo thứ tự tham khảo: 첫 화면 (미니멀) → 이미지 + 소개 → 주요 장점 → 숫자로 보는 성과 → 행동 유도 → 문의 양식 → 하단 정보; màu #8cc9f0, phong cách 미니멀. Mọi khối sửa được trong editor.",
+                        "Chưa test (tốn quota). Có unit test cho phần ghép."],
+                    ["ref-4", "TC 16.4: Website dùng script (SPA)",
+                        [
+                            "Dán <code>https://toss.im</code> → 사이트 읽기."
+                        ],
+                        "Hiện tên 토스, màu xanh Toss, và câu \"이 사이트는 화면을 스크립트로 그려서 구성은 읽지 못했습니다. 색과 분위기만 참고합니다.\"",
+                        "Claude đã test fetch + phân tích: đúng."],
+                    ["ref-5", "TC 16.5: ⭐ Địa chỉ nội bộ / sai bị chặn",
+                        [
+                            "Lần lượt dán: <code>http://localhost:3000</code>, <code>http://127.0.0.1</code>, <code>http://169.254.169.254/latest/meta-data</code>, <code>http://192.168.0.1</code>, <code>abc</code>."
+                        ],
+                        "Đều báo \"이 주소는 열 수 없습니다…\" hoặc \"사이트 주소 형식이 올바르지 않습니다\". Bấm Enter trong ô không nhảy sang bước sau.",
+                        "Claude đã test localhost qua UI + unit test các địa chỉ còn lại."],
+                    ["ref-6", "TC 16.6: Bỏ tham khảo",
+                        [
+                            "Sau khi đọc 1 site, bấm 빼기."
+                        ],
+                        "Ô trống lại, tóm tắt biến mất, 2 ô chọn quay về \"AI가 선택\". Thiết kế ra như bình thường (không theo site nào).",
+                        "Chưa test bằng chuột."],
+                    ["ref-7", "TC 16.7: Chọn tay vẫn thắng tham khảo",
+                        [
+                            "Đọc 1 site tham khảo, rồi tự chọn 디자인 스타일 = 클래식, 색상 = 포레스트 → thiết kế."
+                        ],
+                        "Trang dùng 클래식 + màu xanh lá, không dùng màu/style của site tham khảo; chỉ bố cục theo tham khảo.",
+                        "Có unit test."],
+                    ["ref-8", "TC 16.8: AI로 다시 디자인 trong editor",
+                        [
+                            "Mở 1 trang có sẵn → AI로 다시 디자인 → bước 구성 · 디자인 có ô 참고할 사이트 → dán 1 site → thiết kế."
+                        ],
+                        "Bản đề xuất theo phong cách site tham khảo; áp dụng được như trước.",
+                        "Chưa test."],
+                    ["ref-9", "TC 16.9: Thẻ GitHub đã bỏ",
+                        [
+                            "Bấm 랜딩 페이지 만들기."
+                        ],
+                        "Chỉ còn 2 thẻ: 일반 랜딩, AI 랜딩.",
+                        "Đã bỏ trong commit f5bb40f."],
+                ],
+            },
         ];
 
         // Kết quả Claude chạy thử 12/10/2026 trên http://localhost:3001 (nhánh feat/template-ai-wizard).
         // [trạng thái, ghi chú]: pass | fail | fail-fixed (tìm thấy lỗi và đã sửa) | skip (chưa test được)
         const claudeResults = {
+"ref-1": [
+"pass",
+"13/10: qua harness tạm (wizard thật, API tạm không đăng nhập): tóm tắt và 2 ô chọn đúng."
+],
+"ref-4": [
+"pass",
+"13/10: toss.im → readable=false, màu #022047/#3182f6."
+],
+"ref-5": [
+"pass",
+"13/10: localhost bị chặn trên UI, Enter không nhảy bước; 12 địa chỉ nội bộ khác có unit test."
+],
+"tpl-2": [
+"pass",
+"13/10: xem cả 8 mẫu trên trang preview tạm (không qua editor). Sửa 2 lỗi lúc xem: thẻ 회사명 + 후기 mất padding; mô tả mẫu \"세 가지\" lệch với 5–6 thẻ."
+],
+"tpl-6": [
+"fail-fixed",
+"13/10: nhãn hiện 2 lần ở bản Phase 1 → đã sửa (commit cee3dbd)."
+],
+"tpl-8": [
+"pass",
+"13/10: 375px — magazine, minimal, community không cuộn ngang."
+],
 "tc-8-1": [
 "pass",
 "7 ngành: 3+3+2+1+2+2+1 = 14 template; ảnh thu nhỏ hiện đủ 14."
