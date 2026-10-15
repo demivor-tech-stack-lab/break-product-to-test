@@ -1237,6 +1237,119 @@
                         "Đã bỏ trong commit f5bb40f."],
                 ],
             },
+            {
+                title: "17. AI 랜딩 — luồng mới không dùng template bank (점검 → 레이아웃 → 디자인)",
+                isNew: true,
+                cases: [
+                    ["pipe-1", "TC 17.1: ⭐ Chỉ cần tên + mô tả để bắt đầu",
+                        [
+                            "랜딩 페이지 만들기 → bấm thẻ bên phải <b>AI 랜딩</b>.",
+                            "Chỉ điền 브랜드 (vd: 유월여행) và 무엇을 제공하나요? (vd: <code>여행사를 위한 예약 관리 시스템을 월 구독으로 제공합니다</code>). Để trống 업종, 대상 고객, 장점."
+                        ],
+                        "Stepper 4 bước: 브랜드 정보 → 내용 점검 → 레이아웃 · 디자인 → 페이지 정보. Các ô trống ghi \"(비워 두면 AI가 채움)\". Nút bên dưới là \"내용 점검\" và bấm được.",
+                        "Nhánh feat/ai-landing-pipeline (0a32a8a), đã patch vào feat/template-ai-wizard."],
+                    ["pipe-2", "TC 17.2: ⭐ Controller 점검 + AI điền phần thiếu",
+                        [
+                            "Sau TC 17.1 bấm 내용 점검 (tốn 1 lượt Gemini)."
+                        ],
+                        "Hiện \"입력한 내용을 점검했습니다.\" + danh sách 6 mục. 업종 / 대상 고객 / 장점 có nhãn xanh \"AI가 채움\" và nội dung lấy từ phần mô tả (không có số liệu, giá, khách hàng bịa). 수치·가격·후기 = \"선택 · 비어 있음\". Sửa được ngay trong ô.",
+                        "Chưa test live (cần đăng nhập + quota)."],
+                    ["pipe-3", "TC 17.3: ⭐ Không đổi gì → không gọi AI lại (biến động)",
+                        [
+                            "Ở bước 내용 점검 bấm 다시 점검 mà không sửa gì."
+                        ],
+                        "\"지난 점검 이후 바뀐 내용이 없습니다.\" Không tốn thêm lượt AI (xem log server không có dòng [landing-ai] mới).",
+                        "Chưa test live."],
+                    ["pipe-4", "TC 17.4: Phát hiện mục bị sửa",
+                        [
+                            "Bấm 이전 về 브랜드 정보, sửa 무엇을 제공하나요? → 내용 점검."
+                        ],
+                        "Dòng trên cùng: \"지난 점검 이후 바뀐 항목: 제공하는 것\"; mục đó có nhãn \"변경됨\". Mục AI đã điền mà bạn đã tự sửa không còn nhãn \"AI가 채움\".",
+                        "Chưa test live."],
+                    ["pipe-5", "TC 17.5: AI lỗi vẫn đi tiếp được",
+                        [
+                            "Khi hết quota Gemini (hoặc tắt mạng tới Gemini), làm TC 17.2."
+                        ],
+                        "Hộp đỏ báo lỗi + \"비어 있는 항목은 직접 입력해도 됩니다\". Mục trống có nhãn \"직접 입력 필요\"; điền tay xong nút 다음 bật lại.",
+                        "Chưa test live."],
+                    ["pipe-6", "TC 17.6: ⭐ AI tìm layout (nguồn ẩn)",
+                        [
+                            "Bước 레이아웃 · 디자인, tab \"AI가 레이아웃 찾기\" (mặc định)."
+                        ],
+                        "Vài giây hiện \"레이아웃 1\", 디자인, chấm màu, 밝은/어두운 배경, \"구성 N개 구역: …\". <b>Không</b> có chữ GitHub, tên repo, URL ở đâu cả (kể cả tab Network: response /api/landing-builder/layout chỉ có id dạng L03). Hai ô 디자인 스타일/색상 = \"레이아웃에 맞춤\".",
+                        "11 layout đã tải thử thành công + test không lộ nguồn (unit/live)."],
+                    ["pipe-7", "TC 17.7: 다른 레이아웃",
+                        [
+                            "Bấm 다른 레이아웃 vài lần."
+                        ],
+                        "Mỗi lần ra layout khác (레이아웃 2, 3…), cấu trúc khác nhau. Sau khi xem hết 11 thì quay vòng lại.",
+                        "Chưa test live."],
+                    ["pipe-8", "TC 17.8: Đổi ngành → chọn lại layout",
+                        [
+                            "Quay lại bước 1 đổi 업종 (vd: 여행 · 관광 → 법률 · 세무) → 내용 점검 → 다음."
+                        ],
+                        "Layout tự chọn lại, có dòng \"업종이나 제공하는 것이 바뀌어 레이아웃을 다시 골랐습니다.\"",
+                        "Chưa test live."],
+                    ["pipe-9", "TC 17.9: Dùng website tham khảo thay layout",
+                        [
+                            "Tab \"참고할 사이트 주소\" → làm như TC 16.1."
+                        ],
+                        "Giống TC 16.1. Nút 다음 chỉ bật khi đã đọc xong site.",
+                        "Chưa test live."],
+                    ["pipe-10", "TC 17.10: ⭐ Tạo trang (không template bank)",
+                        [
+                            "Điền tên + địa chỉ → AI로 디자인하기 (tốn 1 lượt Gemini, 1~3 phút)."
+                        ],
+                        "Tóm tắt ghi \"AI 맞춤 디자인 · AI가 고른 레이아웃 (N개 구역)\". Trang ra là thiết kế HTML tự do theo thứ tự/khối của layout, nội dung theo brand; không phải template của web; form + footer thật ở cuối. Sau đó editor tự chạy 글 보완.",
+                        "Chưa test live (quota)."],
+                    ["pipe-11", "TC 17.11: Thẻ trái và gallery vẫn như cũ",
+                        [
+                            "Bấm 일반 랜딩 → chọn template; hoặc mở AI wizard từ trong editor (AI로 다시 디자인)."
+                        ],
+                        "Vẫn là luồng cũ (구성 · 디자인 có 디자인 방식 2 thẻ, 필요한 구역…). Luồng mới chỉ ở thẻ AI 랜딩.",
+                        "Chưa test live."],
+                    ["pipe-13", "TC 17.13: ⭐ Trang mới KHÔNG được tạo từ template (kể cả khi AI lỗi) + nhiều key",
+                        [
+                            "(Tuỳ chọn) .env thêm <code>LANDING_AI_API_KEYS=key2,key3</code> (key ở project Google khác) → khởi động lại npm run dev.",
+                            "Đếm số trang trong danh sách. AI 랜딩 → 브랜드 <code>오롯 플라워 스튜디오</code>, 제공하는 것 <code>결혼식·돌잔치·기업 행사 꽃 장식과 정기 꽃 구독. 상담 후 시안 2개를 보내드리고 행사 전날 직접 설치합니다.</code>, 수치·가격·후기 <code>운영 7년, 꽃 구독 월 39,000원부터, '하객들이 꽃 사진만 찍더라고요' — 신부 이OO님</code>, 업종 <b>để trống</b>.",
+                            "내용 점검 → 다음 → bấm 다른 레이아웃 cho tới khi 구성 khác hẳn (vd có 갤러리) → 다음 → tên <code>[TEST-Claude] 오롯</code>, địa chỉ <code>test-orot</code> → AI로 디자인하기.",
+                            "Trong lúc chờ: thanh tiến trình ghi \"…처음부터 디자인하는 중… (1~4분)\"; danh sách trang ở phía sau KHÔNG có trang mới.",
+                            "Xong → editor mở → Console chạy lệnh ở TC 17.12."
+                        ],
+                        "Console: đúng html / leadForm / footer. Thứ tự khối trong trang theo 구성 của layout đã chọn, không có dải số + 3 thẻ icon + FAQ nếu layout không có. Footer = 오롯 플라워 스튜디오 (không còn chữ \"연락처 / 기업 정보와 연락 방법을 안내합니다\"). Nếu AI lỗi/hết giờ: có thông báo lỗi, KHÔNG có trang mới trong danh sách, không có nút \"AI 없이 편집기로 이동\"; bấm lại AI로 디자인하기 được. Nếu địa chỉ bị trùng: sửa địa chỉ rồi bấm lại → lưu ngay, không chờ AI lần nữa. Có nhiều key: khi key 1 hết quota, log server có dòng <code>key …xxxx 429 on … trying the next key</code> và trang vẫn ra.",
+                        "c6be02a. Chưa test live."],
+                    ["pipe-14", "TC 17.14: ⭐ Quán cà phê — layout dải màu đậm (L08)",
+                        [
+                            "AI 랜딩 → 브랜드 <code>소금빛 로스터리</code>; 업종 <code>스페셜티 커피 카페</code>; 제공하는 것 <code>성수동 스페셜티 커피 로스터리 카페. 매주 직접 볶은 원두를 정기 배송하고, 사무실 행사에 핸드드립 커피 케이터링을 해 드립니다.</code>; 수치·가격·후기 <code>원두 구독 월 24,000원부터, '회의 때마다 커피 칭찬을 들어요' — 디자인 회사 박OO 팀장</code>; 문체 친근하게; 목표 예약 받기. Để trống 대상 고객, 장점.",
+                            "내용 점검 → 다음 → layout tự chọn: 구성 7개 구역 (첫 화면 → 행동 유도 → 주요 장점 → 행동 유도 → 이미지 카드 → 행동 유도 → 문의). 색상: 브랜드 색 직접 입력 <code>#7c2d12</code> → ô <b>디자인 콘셉트</b> chọn <b>브루탈리스트</b> → 다음 → tên <code>[TEST-Claude] 소금빛</code>, địa chỉ <code>test-sogeumbit</code> → AI로 디자인하기."
+                        ],
+                        "Console (lệnh ở TC 17.12) = đúng html / leadForm / footer. Trang kiểu brutalist: viền đen dày, bóng đổ lệch, nền vàng/hồng/xanh phẳng, dải chữ chạy ngang; giọng văn thân mật; có 24,000원 và câu review đúng như nhập.",
+                        "29c9189. Chưa test live. So sánh chéo: 3 trang khác nhau về thứ tự khối, màu, giọng văn; mở 일반 랜딩 → template xem trước: không template nào có thứ tự/khối như 3 trang này."],
+                    ["pipe-15", "TC 17.15: ⭐ Văn phòng thuế — layout bảng giá + bài viết (L06)",
+                        [
+                            "AI 랜딩 → 브랜드 <code>한결 세무회계</code>; 업종 <code>세무회계 사무소</code>; 제공하는 것 <code>중소기업 대상 세무 기장, 법인세 신고, 노무 자문을 월 구독 요금제로 제공합니다. 담당 세무사가 매달 재무 리포트를 보내 드립니다.</code>; 대상 고객 <code>직원 5~50명 규모 법인 대표</code>; 수치·가격·후기 <code>베이직 월 150,000원, 프리미엄 월 300,000원, 고객사 210곳</code>; 문체 신뢰감 있게; 목표 상담 신청 받기. Để trống 장점.",
+                            "내용 점검 → 다음 → layout: 구성 5개 구역 (첫 화면 → 주요 장점 → 요금 → 글 → 문의). Để 색상 tự động, 디자인 콘셉트 chọn <b>스플릿 스크린</b> → 다음 → <code>[TEST-Claude] 한결</code>, <code>test-hangyeol</code> → AI로 디자인하기."
+                        ],
+                        "Console (lệnh ở TC 17.12) = đúng html / leadForm / footer. Màn hình chia đôi: cột trái tối cố định (tên + nút tư vấn) khi cuộn, cột phải là các mục đánh số. Có khối bảng giá đúng 2 gói 150,000원 / 300,000원 (không có gói thứ 3 bịa ra), số 210곳; một khối dạng bài viết dài; giọng trang trọng. Không có khối review (không nhập review).",
+                        "29c9189. Chưa test live. So sánh chéo: 3 trang khác nhau về thứ tự khối, màu, giọng văn; mở 일반 랜딩 → template xem trước: không template nào có thứ tự/khối như 3 trang này."],
+                    ["pipe-16", "TC 17.16: ⭐ Xưởng gia công — theo website tham khảo",
+                        [
+                            "AI 랜딩 → 브랜드 <code>대성정밀</code>; 업종 <code>금형 · CNC 정밀 가공</code>; 제공하는 것 <code>자동차 부품용 금형 설계와 CNC 정밀 가공. 시제품 1개부터 월 2만 개 양산까지 직접 가공해 납품합니다.</code>; 수치·가격·후기 <code>업력 23년, 가공 공차 ±0.005mm, 월 생산 20,000개</code>; 문체 전문적으로; 목표 견적 요청 받기. Để trống 대상 고객, 장점.",
+                            "내용 점검 → 다음 → tab <b>참고할 사이트 주소</b> → <code>https://html5up.net/uploads/demos/stellar/</code> → 사이트 읽기 (구성 6개 구역, 대표 색 #8cc9f0). Để 디자인 스타일 / 색상 = 참고 사이트에 맞춤 → 다음 → <code>[TEST-Claude] 대성정밀</code>, <code>test-daesung</code> → AI로 디자인하기."
+                        ],
+                        "Console (lệnh ở TC 17.12) = đúng html / leadForm / footer. Thứ tự gần giống Stellar (첫 화면 → 소개 có ảnh → 장점 → 숫자 성과 → 행동 유도), có dải số 23년 / ±0.005mm / 20,000개; màu xanh nhạt; không có chữ tiếng Anh, logo hay ảnh của Stellar.",
+                        "29c9189. Chưa test live. So sánh chéo: 3 trang khác nhau về thứ tự khối, màu, giọng văn; mở 일반 랜딩 → template xem trước: không template nào có thứ tự/khối như 3 trang này."],
+                    ["pipe-12", "TC 17.12: ⭐ End-to-end: chỉ điền popup → trang hoàn chỉnh, không phải template bank",
+                        [
+                            "AI 랜딩 → 브랜드: <code>바른숨 한의원</code>; 제공하는 것: <code>비염·알레르기 환자를 위한 한방 치료. 초진 때 체질 검사 후 3개월 맞춤 치료 계획을 세우고, 2주마다 경과를 확인합니다.</code>; 수치·가격·후기: <code>개원 12년, 초진 상담 30,000원, '봄마다 달고 살던 휴지를 끊었어요' — 직장인 김OO님</code>. Để trống 업종/대상 고객/장점. 페이지 목표: 예약 받기.",
+                            "내용 점검 → kiểm tra AI điền 업종/대상 고객/장점 → 다음.",
+                            "Để \"AI가 레이아웃 찾기\", ghi lại cấu trúc 구성 N개 구역 → 다음 → tên <code>[TEST-Claude] 바른숨</code>, địa chỉ <code>test-bareunsum</code> → AI로 디자인하기. Chờ editor mở + 글 보완 tự chạy xong.",
+                            "F12 Console chạy: <code>fetch(location.pathname.replace('/landing-builder/','/api/admin/landing-pages/')).then(r=>r.json()).then(d=>console.table(d.item.draft_document.blocks.map(b=>({type:b.type,variant:b.variant}))))</code>"
+                        ],
+                        "Console: đúng 3 khối html / leadForm / footer (không có hero, features… của template bank). Trang: thanh trên có tên brand, hero, các khối theo thứ tự layout ở bước 3, có số \"12년\", giá 30,000원 và review đúng như nhập, không có số/review nào khác. Không còn chữ mẫu (브랜드 이름, 예시, lorem, \"제목을 입력\"). Form cuối trang có tiêu đề riêng của brand; footer có tên brand. Chỗ ảnh là khung trống để người dùng bấm vào thêm ảnh (cố ý, AI không dùng ảnh).",
+                        "Chưa test live."],
+                ],
+            },
         ];
 
         // Kết quả Claude chạy thử 12/10/2026 trên http://localhost:3001 (nhánh feat/template-ai-wizard).
